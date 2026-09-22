@@ -1,19 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { useSwissSimulation } from '../src/hooks/useSwissSimulation';
-import { usePlayoffsSimulation } from '../src/hooks/usePlayoffsSimulation';
 import { Navbar, ActiveTab } from '../src/components/Navbar';
 import { RoundColumn } from '../src/components/RoundColumn';
 import { FinalZoneColumn } from '../src/components/FinalZoneColumn';
-import { PlayoffsBracket } from '../src/components/playoffs/PlayoffsBracket';
+
+// Lazy-load Playoffs completely so its code, draw algorithm and components
+// are NOT downloaded in the initial bundle until the user accesses Playoffs.
+const PlayoffsView = dynamic(
+  () => import('../src/components/playoffs/PlayoffsView').then((m) => m.PlayoffsView),
+  {
+    loading: () => (
+      <div className="w-full min-h-[450px] flex flex-col items-center justify-center p-12 text-zinc-500 text-xs">
+        <div className="w-5 h-5 border-2 border-zinc-700 border-t-amber-400 rounded-full animate-spin mb-3" />
+        <span>Cargando Cuadro de Playoffs...</span>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export default function WorldsSimulatorPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('swiss');
+  const [hasChampion, setHasChampion] = useState(false);
+  const playoffsResetRef = useRef<(() => void) | null>(null);
 
   // Swiss stage state
   const {
-    teams,
     currentRound,
     rounds,
     activeMatches,
@@ -28,22 +43,11 @@ export default function WorldsSimulatorPage() {
     autoPickWinners: autoPickSwissWinners,
   } = useSwissSimulation();
 
-  // Playoffs state
-  const {
-    bracket: playoffBracket,
-    canReroll,
-    reroll: rerollPlayoffs,
-    selectWinner: selectPlayoffWinner,
-    resetPlayoffs,
-    initializeBracket,
-  } = usePlayoffsSimulation(qualifiedTeams);
-
-  // Sync playoffs bracket whenever the 8 qualified teams are ready
-  useEffect(() => {
-    if (isSwissFinished && qualifiedTeams.length === 8) {
-      initializeBracket(qualifiedTeams);
-    }
-  }, [isSwissFinished, qualifiedTeams, initializeBracket]);
+  const handleResetSwiss = () => {
+    setHasChampion(false);
+    playoffsResetRef.current = null;
+    resetSwissSimulation();
+  };
 
   const selectedCount = Object.keys(selectedWinners).length;
 
@@ -60,11 +64,11 @@ export default function WorldsSimulatorPage() {
         qualifiedCount={qualifiedTeams.length}
         eliminatedCount={eliminatedTeams.length}
         isFinished={isSwissFinished}
-        hasChampion={!!playoffBracket?.champion}
+        hasChampion={hasChampion}
         onConfirmRound={confirmSwissRound}
         onAutoPick={autoPickSwissWinners}
-        onResetSwiss={resetSwissSimulation}
-        onResetPlayoffs={resetPlayoffs}
+        onResetSwiss={handleResetSwiss}
+        onResetPlayoffs={() => playoffsResetRef.current?.()}
       />
 
       {/* Main View Area */}
@@ -97,16 +101,16 @@ export default function WorldsSimulatorPage() {
             />
           </div>
         ) : (
-          /* Playoffs Stage: Single Elimination Bracket */
-          <div className="w-full min-w-[950px] p-2">
-            <PlayoffsBracket
-              bracket={playoffBracket}
-              canReroll={canReroll}
-              onReroll={rerollPlayoffs}
-              onSelectWinner={selectPlayoffWinner}
-              onBackToSwiss={() => setActiveTab('swiss')}
-            />
-          </div>
+          /* Playoffs Stage: Dynamically Loaded via next/dynamic */
+          <PlayoffsView
+            qualifiedTeams={qualifiedTeams}
+            isSwissFinished={isSwissFinished}
+            onBackToSwiss={() => setActiveTab('swiss')}
+            onChampionChange={setHasChampion}
+            onResetRegister={(resetFn) => {
+              playoffsResetRef.current = resetFn;
+            }}
+          />
         )}
       </main>
     </div>

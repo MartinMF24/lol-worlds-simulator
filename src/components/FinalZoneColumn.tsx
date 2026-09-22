@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Team } from '../types/swiss';
 import { getTeamImage } from '../data/teamImages';
 
@@ -37,10 +38,12 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
           <span className="text-[10px] font-mono text-zinc-400 font-medium w-3.5">
             #{index + 1}
           </span>
-          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700">
-            <img
+          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
+            <Image
               src={getTeamImage(team.imageKey)}
               alt={team.name}
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
             />
           </div>

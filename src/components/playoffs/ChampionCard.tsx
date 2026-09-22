@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Team } from '../../types/swiss';
 import { getTeamImage } from '../../data/teamImages';
 import { Trophy } from 'lucide-react';
@@ -33,10 +34,12 @@ export const ChampionCard: React.FC<ChampionCardProps> = ({ champion }) => {
       </div>
 
       {/* Team Avatar */}
-      <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-900 border-2 border-amber-400/60 p-0.5 mb-2 shadow-sm">
-        <img
+      <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-900 border-2 border-amber-400/60 p-0.5 mb-2 shadow-sm relative">
+        <Image
           src={getTeamImage(champion.imageKey)}
           alt={champion.name}
+          width={56}
+          height={56}
           className="w-full h-full object-cover rounded"
         />
       </div>

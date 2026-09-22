@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Match, Team } from '../types/swiss';
 import { getTeamImage } from '../data/teamImages';
 import { Check } from 'lucide-react';
@@ -42,12 +43,13 @@ export const MatchCard: React.FC<MatchCardProps> = ({
       >
         {/* Left: Avatar & Team Info */}
         <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
-          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700">
-            <img
+          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
+            <Image
               src={getTeamImage(team.imageKey)}
               alt={team.name}
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
-              loading="lazy"
             />
           </div>
 
