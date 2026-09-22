@@ -1,5 +1,4 @@
-import React from 'react';
-import { RotateCcw, Trophy } from 'lucide-react';
+import { RotateCcw, Trophy, Info } from 'lucide-react';
 
 export type ActiveTab = 'swiss' | 'playoffs';
 
@@ -114,6 +113,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             <>
               {!isFinished ? (
                 <>
+                  {/* Info Tooltip */}
+                  <div className="relative group flex items-center">
+                    <button
+                      type="button"
+                      className="text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 bg-zinc-900 border border-zinc-750 p-1.5 rounded-md transition-colors duration-150"
+                      title="Información del simulador"
+                      aria-label="Información del simulador"
+                    >
+                      <Info className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-zinc-750 shadow-xl text-zinc-300 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                      <div className="flex items-center gap-1.5 font-semibold text-zinc-100 mb-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        <span>Modo de Prueba</span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-zinc-400">
+                        Este simulador es un modo de prueba. Se irá actualizando a medida que se definan los equipos restantes y se acomodará en tiempo real conforme se disputen las rondas en la vida real.
+                      </p>
+                    </div>
+                  </div>
+
                   {/* Auto-completar */}
                   <button
                     type="button"
