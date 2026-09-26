@@ -1,6 +1,9 @@
 import { Team } from '../types/swiss';
 
-export const INITIAL_TEAMS: Team[] = [
+/**
+ * 15 fixed teams confirmed for the main event
+ */
+export const BASE_15_TEAMS: Team[] = [
   // LPL (China)
   {
     id: 'al',
@@ -162,26 +165,73 @@ export const INITIAL_TEAMS: Team[] = [
     pastOpponents: [],
     imageKey: 'cblol_seed_2',
   },
+];
 
-  // Wildcard (Play-in Winner)
+/**
+ * 4 Play-in candidates competing for slot 16 (Seed 4)
+ */
+export const PLAY_IN_CANDIDATES: Team[] = [
   {
-    id: 'playin4',
-    name: 'Play-in Team 4',
-    region: 'Wildcard',
+    id: 'kc',
+    name: 'Karmine Corp',
+    region: 'LEC',
     seed: 4,
     wins: 0,
     losses: 0,
     pastOpponents: [],
-    imageKey: 'playin_seed_4',
+    imageKey: 'Karmine_Corp',
+  },
+  {
+    id: 'mvk',
+    name: 'MVK Esports',
+    region: 'PCS/VCS',
+    seed: 4,
+    wins: 0,
+    losses: 0,
+    pastOpponents: [],
+    imageKey: 'MVK_Esport',
+  },
+  {
+    id: 'lcs_pi',
+    name: 'NA Play-in Team',
+    region: 'LCS',
+    seed: 4,
+    wins: 0,
+    losses: 0,
+    pastOpponents: [],
+    imageKey: 'LCS_play_in',
+  },
+  {
+    id: 'cblol_pi',
+    name: 'Brazil Play-in Team',
+    region: 'CBLOL',
+    seed: 4,
+    wins: 0,
+    losses: 0,
+    pastOpponents: [],
+    imageKey: 'CBLOL_play_in',
   },
 ];
 
-export const createInitialTeams = (): Team[] => {
-  return INITIAL_TEAMS.map((t) => ({
+/**
+ * Legacy 16-teams array (uses default first candidate as fallback)
+ */
+export const INITIAL_TEAMS: Team[] = [
+  ...BASE_15_TEAMS,
+  PLAY_IN_CANDIDATES[0],
+];
+
+/**
+ * Creates a clean 16-team array with the selected Play-in candidate in position 16.
+ */
+export const createInitialTeams = (playInCandidate?: Team): Team[] => {
+  const candidate = playInCandidate || PLAY_IN_CANDIDATES[0];
+  const full16 = [...BASE_15_TEAMS, candidate];
+
+  return full16.map((t) => ({
     ...t,
     wins: 0,
     losses: 0,
     pastOpponents: [],
   }));
 };
-

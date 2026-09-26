@@ -15,8 +15,28 @@ export const teamImages: Record<string, string> = {
   t1: '/assets/T1.jpg',
   team_secret_whales: '/assets/Team_Secret_Whales.jpg',
   top_esports: '/assets/Top_Esports.jpg',
+
+  // Play-in Candidates
+  karmine_corp: '/assets/Karmine_Corp.jpg',
+  Karmine_Corp: '/assets/Karmine_Corp.jpg',
+  mvk_esport: '/assets/MVK_Esports.jpg',
+  MVK_Esport: '/assets/MVK_Esports.jpg',
+  mvk_esports: '/assets/MVK_Esports.jpg',
+  MVK_Esports: '/assets/MVK_Esports.jpg',
+  lcs_play_in: '/assets/Lcs_play_in.jpg',
+  LCS_play_in: '/assets/Lcs_play_in.jpg',
+  cblol_play_in: '/assets/CBLOL_play_in.jpg',
+  CBLOL_play_in: '/assets/CBLOL_play_in.jpg',
+
+  // Branding
+  worlds: '/assets/Worlds.jpg?v=2',
+  Worlds: '/assets/Worlds.jpg?v=2',
 };
 
 export const getTeamImage = (imageKey: string): string => {
-  return teamImages[imageKey] || '/assets/Gen.G.jpg';
+  return (
+    teamImages[imageKey] ||
+    teamImages[imageKey.toLowerCase()] ||
+    '/assets/Gen.G.jpg'
+  );
 };

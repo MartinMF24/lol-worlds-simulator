@@ -9,10 +9,35 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Simulador Fase Suiza — Worlds 2026',
-  description: 'Simulador analítico del Campeonato Mundial de League of Legends',
+  metadataBase: new URL('https://simulador-world-2026.vercel.app'),
+  title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
+  description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
   icons: {
-    icon: '/assets/G2_Esport.jpg',
+    icon: '/assets/Worlds.jpg?v=2',
+    shortcut: '/assets/Worlds.jpg?v=2',
+    apple: '/assets/Worlds.jpg?v=2',
+  },
+  openGraph: {
+    title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
+    description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
+    url: 'https://simulador-world-2026.vercel.app',
+    siteName: 'Simulador Worlds 2026',
+    images: [
+      {
+        url: '/assets/Worlds.jpg?v=2',
+        width: 1200,
+        height: 630,
+        alt: 'Simulador Worlds 2026',
+      },
+    ],
+    locale: 'es_ES',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
+    description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
+    images: ['/assets/Worlds.jpg?v=2'],
   },
 };
 

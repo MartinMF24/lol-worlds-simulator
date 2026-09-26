@@ -1,6 +1,6 @@
-// Automated simulation test for Swiss Draw rules
+// Automated simulation test for Swiss Draw rules with dynamic Play-in candidates
 
-const TEAMS = [
+const BASE_15_TEAMS = [
   // LPL
   { id: 'al', name: "Anyone's Legend", region: 'LPL', seed: 1 },
   { id: 'blg', name: 'Bilibili Gaming', region: 'LPL', seed: 2 },
@@ -22,8 +22,13 @@ const TEAMS = [
   { id: 'lcs3', name: 'NA Team 3', region: 'LCS', seed: 3 },
   // CBLOL
   { id: 'cblol2', name: 'Brazil Team 2', region: 'CBLOL', seed: 2 },
-  // Wildcard
-  { id: 'playin4', name: 'Play-in Team 4', region: 'Wildcard', seed: 4 },
+];
+
+const PLAY_IN_CANDIDATES = [
+  { id: 'kc', name: 'Karmine Corp', region: 'LEC', seed: 4 },
+  { id: 'mvk', name: 'MVK Esports', region: 'PCS/VCS', seed: 4 },
+  { id: 'lcs_pi', name: 'NA Play-in Team', region: 'LCS', seed: 4 },
+  { id: 'cblol_pi', name: 'Brazil Play-in Team', region: 'CBLOL', seed: 4 },
 ];
 
 function shuffle(array) {
@@ -119,8 +124,9 @@ function generateSubsequentRound(teams) {
   return allMatches;
 }
 
-function runFullSimulation(simIndex) {
-  let teams = TEAMS.map(t => ({
+function runFullSimulation(candidate, simIndex) {
+  const full16 = [...BASE_15_TEAMS, candidate];
+  let teams = full16.map(t => ({
     ...t,
     wins: 0,
     losses: 0,
@@ -143,8 +149,23 @@ function runFullSimulation(simIndex) {
       // 2. Check Round 1 region & seed rules
       if (round === 1) {
         if (t1.region === t2.region) {
-          throw new Error(`SAME REGION in round 1: ${t1.name} (${t1.region}) vs ${t2.name} (${t2.region})`);
+          throw new Error(`SAME REGION in round 1 with candidate ${candidate.name}: ${t1.name} (${t1.region}) vs ${t2.name} (${t2.region})`);
         }
+
+        // Specific test: If candidate is Karmine Corp (LEC), ensure NEVER plays G2 (LEC)
+        if (candidate.id === 'kc') {
+          if ((t1.id === 'kc' && t2.id === 'g2') || (t1.id === 'g2' && t2.id === 'kc')) {
+            throw new Error(`Karmine Corp played G2 Esports in Round 1!`);
+          }
+        }
+
+        // Specific test: If candidate is NA Play-in Team (LCS), ensure NEVER plays NA Team 1 (LCS)
+        if (candidate.id === 'lcs_pi') {
+          if ((t1.id === 'lcs_pi' && t2.id === 'lcs1') || (t1.id === 'lcs1' && t2.id === 'lcs_pi')) {
+            throw new Error(`NA Play-in Team played NA Team 1 in Round 1!`);
+          }
+        }
+
         const seeds = [t1.seed, t2.seed].sort().join('-');
         if (seeds !== '1-4' && seeds !== '2-3') {
           throw new Error(`INVALID SEED MATCHUP in round 1: ${seeds}`);
@@ -162,7 +183,6 @@ function runFullSimulation(simIndex) {
       const winner = Math.random() > 0.5 ? t1 : t2;
       const loser = winner === t1 ? t2 : t1;
 
-      // Mutate
       const refWinner = teams.find(t => t.id === winner.id);
       const refLoser = teams.find(t => t.id === loser.id);
 
@@ -187,15 +207,19 @@ function runFullSimulation(simIndex) {
   return { qualified, eliminated };
 }
 
-console.log('🚀 Starting 100 full Swiss Stage simulation tests...');
+console.log('🚀 Starting 400 full Swiss Stage simulation tests across all 4 Play-in candidates...');
 const startTime = Date.now();
-for (let i = 1; i <= 100; i++) {
-  runFullSimulation(i);
+
+for (const candidate of PLAY_IN_CANDIDATES) {
+  for (let i = 1; i <= 100; i++) {
+    runFullSimulation(candidate, i);
+  }
+  console.log(`  ✓ 100 simulations passed for candidate: ${candidate.name} (${candidate.region})`);
 }
+
 const elapsed = Date.now() - startTime;
-console.log(`✅ All 100 Swiss tournaments PASSED in ${elapsed}ms!`);
+console.log(`✅ All 400 Swiss tournaments PASSED in ${elapsed}ms!`);
 console.log('  - Seed 1 vs 4 & Seed 2 vs 3 respected 100%');
-console.log('  - 0 same-region matchups in Round 1');
+console.log('  - 0 same-region matchups in Round 1 (including Karmine Corp vs G2, NA Play-in vs NA Team 1)');
 console.log('  - 0 rematches across all rounds');
 console.log('  - 100% exact 8 qualified (3-0, 3-1, 3-2) and 8 eliminated (0-3, 1-3, 2-3)');
-

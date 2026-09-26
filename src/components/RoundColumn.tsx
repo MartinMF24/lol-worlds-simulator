@@ -2,6 +2,7 @@ import React from 'react';
 import { Match, Round } from '../types/swiss';
 import { RecordPoolGroup } from './RecordPoolGroup';
 import { MatchCard } from './MatchCard';
+import { Dices } from 'lucide-react';
 
 interface RoundColumnProps {
   roundNumber: number;
@@ -11,6 +12,7 @@ interface RoundColumnProps {
   activeMatches?: Match[];
   selectedWinners: Record<string, string>;
   onSelectWinner?: (matchId: string, winnerId: string) => void;
+  onRerollRound?: () => void;
 }
 
 export const RoundColumn: React.FC<RoundColumnProps> = ({
@@ -21,6 +23,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = ({
   activeMatches,
   selectedWinners,
   onSelectWinner,
+  onRerollRound,
 }) => {
   const isPast = roundNumber < currentRound || (isFinished && roundNumber <= currentRound);
   const isActive = roundNumber === currentRound && !isFinished;
@@ -72,9 +75,22 @@ export const RoundColumn: React.FC<RoundColumnProps> = ({
               Completada
             </span>
           ) : isActive ? (
-            <span className="text-[10px] font-semibold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
-              En juego
-            </span>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              {onRerollRound && (
+                <button
+                  type="button"
+                  onClick={onRerollRound}
+                  title="Volver a sortear los partidos de esta ronda"
+                  aria-label="Volver a sortear los partidos de esta ronda"
+                  className="p-1 rounded text-zinc-400 hover:text-amber-300 bg-zinc-800/90 hover:bg-zinc-750 border border-zinc-700 hover:border-zinc-600 transition-colors duration-150 cursor-pointer flex items-center justify-center"
+                >
+                  <Dices className="w-3.5 h-3.5 text-amber-400" />
+                </button>
+              )}
+              <span className="text-[10px] font-semibold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                En juego
+              </span>
+            </div>
           ) : (
             <span className="text-[10px] text-zinc-500 font-normal">
               Pendiente
