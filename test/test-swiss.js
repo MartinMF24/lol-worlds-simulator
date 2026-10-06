@@ -18,8 +18,8 @@ const BASE_15_TEAMS = [
   { id: 'tsw', name: 'Team Secret Whales', region: 'PCS/VCS', seed: 2 },
   { id: 'cfo', name: 'CTBC Flying Oyster', region: 'PCS/VCS', seed: 4 },
   // LCS
-  { id: 'lcs1', name: 'NA Team 1', region: 'LCS', seed: 1 },
-  { id: 'lcs3', name: 'NA Team 3', region: 'LCS', seed: 3 },
+  { id: 'tl', name: 'Team Liquid', region: 'LCS', seed: 1 },
+  { id: 'lyon', name: 'Lyon', region: 'LCS', seed: 3 },
   // CBLOL
   { id: 'cblol2', name: 'Brazil Team 2', region: 'CBLOL', seed: 2 },
 ];
@@ -27,7 +27,7 @@ const BASE_15_TEAMS = [
 const PLAY_IN_CANDIDATES = [
   { id: 'kc', name: 'Karmine Corp', region: 'LEC', seed: 4 },
   { id: 'mvk', name: 'MVK Esports', region: 'PCS/VCS', seed: 4 },
-  { id: 'lcs_pi', name: 'NA Play-in Team', region: 'LCS', seed: 4 },
+  { id: 'c9', name: 'Cloud9', region: 'LCS', seed: 4 },
   { id: 'cblol_pi', name: 'Brazil Play-in Team', region: 'CBLOL', seed: 4 },
 ];
 
@@ -159,10 +159,10 @@ function runFullSimulation(candidate, simIndex) {
           }
         }
 
-        // Specific test: If candidate is NA Play-in Team (LCS), ensure NEVER plays NA Team 1 (LCS)
-        if (candidate.id === 'lcs_pi') {
-          if ((t1.id === 'lcs_pi' && t2.id === 'lcs1') || (t1.id === 'lcs1' && t2.id === 'lcs_pi')) {
-            throw new Error(`NA Play-in Team played NA Team 1 in Round 1!`);
+        // Specific test: If candidate is Cloud9 (LCS), ensure NEVER plays Team Liquid (LCS)
+        if (candidate.id === 'c9' || candidate.id === 'lcs_pi') {
+          if ((t1.id === candidate.id && (t2.id === 'tl' || t2.id === 'lcs1')) || ((t1.id === 'tl' || t1.id === 'lcs1') && t2.id === candidate.id)) {
+            throw new Error(`Cloud9 played Team Liquid in Round 1!`);
           }
         }
 
@@ -220,6 +220,6 @@ for (const candidate of PLAY_IN_CANDIDATES) {
 const elapsed = Date.now() - startTime;
 console.log(`✅ All 400 Swiss tournaments PASSED in ${elapsed}ms!`);
 console.log('  - Seed 1 vs 4 & Seed 2 vs 3 respected 100%');
-console.log('  - 0 same-region matchups in Round 1 (including Karmine Corp vs G2, NA Play-in vs NA Team 1)');
+console.log('  - 0 same-region matchups in Round 1 (including Karmine Corp vs G2, Cloud9 vs Team Liquid)');
 console.log('  - 0 rematches across all rounds');
 console.log('  - 100% exact 8 qualified (3-0, 3-1, 3-2) and 8 eliminated (0-3, 1-3, 2-3)');

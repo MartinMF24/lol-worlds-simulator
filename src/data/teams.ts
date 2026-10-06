@@ -134,24 +134,24 @@ export const BASE_15_TEAMS: Team[] = [
 
   // LCS (NA)
   {
-    id: 'lcs1',
-    name: 'NA Team 1',
+    id: 'tl',
+    name: 'Team Liquid',
     region: 'LCS',
     seed: 1,
     wins: 0,
     losses: 0,
     pastOpponents: [],
-    imageKey: 'lcs_seed_1',
+    imageKey: 'team_liquid',
   },
   {
-    id: 'lcs3',
-    name: 'NA Team 3',
+    id: 'lyon',
+    name: 'Lyon',
     region: 'LCS',
     seed: 3,
     wins: 0,
     losses: 0,
     pastOpponents: [],
-    imageKey: 'lcs_seed_3',
+    imageKey: 'lyon',
   },
 
   // CBLOL (Brazil)
@@ -192,14 +192,14 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     imageKey: 'MVK_Esport',
   },
   {
-    id: 'lcs_pi',
-    name: 'NA Play-in Team',
+    id: 'c9',
+    name: 'Cloud9',
     region: 'LCS',
     seed: 4,
     wins: 0,
     losses: 0,
     pastOpponents: [],
-    imageKey: 'LCS_play_in',
+    imageKey: 'cloud9',
   },
   {
     id: 'cblol_pi',
