@@ -31,8 +31,8 @@ export const teamImages: Record<string, string> = {
   CBLOL_play_in: '/assets/CBLOL_play_in.jpg',
 
   // Branding
-  worlds: '/assets/Worlds.jpg?v=2',
-  Worlds: '/assets/Worlds.jpg?v=2',
+  worlds: '/assets/Worlds.jpg',
+  Worlds: '/assets/Worlds.jpg',
 };
 
 export const getTeamImage = (imageKey: string): string => {

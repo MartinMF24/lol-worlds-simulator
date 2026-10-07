@@ -15,7 +15,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       {/* Central Logo Container with subtle pulse animation */}
       <div className="relative w-28 sm:w-36 h-28 sm:h-36 rounded-2xl overflow-hidden border border-zinc-750/80 bg-zinc-900 shadow-2xl p-3 flex items-center justify-center animate-pulse">
         <Image
-          src="/assets/Worlds.jpg?v=2"
+          src="/assets/Worlds.jpg"
           alt="Worlds 2026"
           width={160}
           height={160}

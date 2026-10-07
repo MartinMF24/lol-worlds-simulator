@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
   description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
   icons: {
-    icon: '/assets/Worlds.jpg?v=2',
-    shortcut: '/assets/Worlds.jpg?v=2',
-    apple: '/assets/Worlds.jpg?v=2',
+    icon: '/assets/icon-48.png',
+    shortcut: '/assets/icon-48.png',
+    apple: '/assets/icon-48.png',
   },
   openGraph: {
     title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: 'Simulador Worlds 2026',
     images: [
       {
-        url: '/assets/Worlds.jpg?v=2',
+        url: '/assets/Worlds.jpg',
         width: 1200,
         height: 630,
         alt: 'Simulador Worlds 2026',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
     description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
-    images: ['/assets/Worlds.jpg?v=2'],
+    images: ['/assets/Worlds.jpg'],
   },
 };
 
