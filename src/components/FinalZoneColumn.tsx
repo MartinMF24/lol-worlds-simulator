@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Team } from '../types/swiss';
 import { getTeamImage } from '../data/teamImages';
+import { TeamRosterTooltip } from './TeamRosterTooltip';
 
 interface FinalZoneColumnProps {
   qualifiedTeams: Team[];
@@ -29,10 +30,10 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
     }
 
     return (
-      <div
-        key={team.id}
-        className="h-7 rounded border border-zinc-750 bg-zinc-900/80 px-2 flex items-center justify-between hover:border-zinc-650 transition-colors duration-150"
-      >
+      <TeamRosterTooltip key={team.id} team={team}>
+        <div
+          className="h-7 rounded border border-zinc-750 bg-zinc-900/80 px-2 flex items-center justify-between hover:border-zinc-650 transition-colors duration-150 cursor-default"
+        >
         {/* Team Details */}
         <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
           <span className="text-[10px] font-mono text-zinc-400 font-medium w-3.5">
@@ -66,6 +67,7 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
           {team.wins}-{team.losses}
         </span>
       </div>
+    </TeamRosterTooltip>
     );
   };
 

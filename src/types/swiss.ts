@@ -7,6 +7,14 @@ export type Region =
   | 'CBLOL' 
   | 'Wildcard';
 
+export interface TeamRoster {
+  top: string;
+  jungle: string;
+  mid: string;
+  bot: string;
+  support: string;
+}
+
 export interface Team {
   id: string;
   name: string;
@@ -16,6 +24,7 @@ export interface Team {
   losses: number;
   pastOpponents: string[]; // List of opponent team IDs
   imageKey: string;
+  roster?: TeamRoster;
 }
 
 export interface Match {

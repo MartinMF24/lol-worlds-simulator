@@ -14,6 +14,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'anyones_legend',
+    roster: {
+      top: 'Flandre',
+      jungle: 'Tarzan',
+      mid: 'Shanks',
+      bot: 'Hope',
+      support: 'Kael',
+    },
   },
   {
     id: 'blg',
@@ -24,6 +31,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'bilibili_gaming',
+    roster: {
+      top: 'Bin',
+      jungle: 'Xun',
+      mid: 'Knight',
+      bot: 'Viper',
+      support: 'ON',
+    },
   },
   {
     id: 'tes',
@@ -34,6 +48,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'top_esports',
+    roster: {
+      top: '369',
+      jungle: 'Tian',
+      mid: 'Creme',
+      bot: 'JackeyLove',
+      support: 'Zhuo',
+    },
   },
   {
     id: 'ig',
@@ -44,6 +65,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'invictus_gaming',
+    roster: {
+      top: 'TheShy',
+      jungle: 'Wei',
+      mid: 'Rookie',
+      bot: 'Assum / JiaQi',
+      support: 'Meiko',
+    },
   },
 
   // LCK (Korea)
@@ -56,6 +84,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'geng',
+    roster: {
+      top: 'Kiin',
+      jungle: 'Canyon',
+      mid: 'Chovy',
+      bot: 'Ruler',
+      support: 'Duro',
+    },
   },
   {
     id: 'hle',
@@ -66,6 +101,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'hanwha_life',
+    roster: {
+      top: 'Zeus',
+      jungle: 'Kanavi',
+      mid: 'Zeka',
+      bot: 'Gumayusi',
+      support: 'Delight',
+    },
   },
   {
     id: 't1',
@@ -76,6 +118,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 't1',
+    roster: {
+      top: 'Doran',
+      jungle: 'Oner',
+      mid: 'Faker',
+      bot: 'Peyz',
+      support: 'Keria',
+    },
   },
   {
     id: 'dk',
@@ -86,6 +135,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'dplus_kia',
+    roster: {
+      top: 'Siwoo',
+      jungle: 'Lucid',
+      mid: 'ShowMaker',
+      bot: 'Smash',
+      support: 'Career',
+    },
   },
 
   // LEC (Europa)
@@ -98,6 +154,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'g2_esport',
+    roster: {
+      top: 'BrokenBlade',
+      jungle: 'SkewMond',
+      mid: 'Caps',
+      bot: 'Hans Sama',
+      support: 'Labrov',
+    },
   },
   {
     id: 'mkoi',
@@ -108,6 +171,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'movistar_koi',
+    roster: {
+      top: 'Myrwn',
+      jungle: 'Elyoya',
+      mid: 'Jojopyun',
+      bot: 'Supa',
+      support: 'Alvaro',
+    },
   },
 
   // PCS/VCS (Asia-Pacific)
@@ -120,6 +190,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'team_secret_whales',
+    roster: {
+      top: 'Pun',
+      jungle: 'Hizto',
+      mid: 'Dire',
+      bot: 'Eddie',
+      support: 'Bie',
+    },
   },
   {
     id: 'cfo',
@@ -130,6 +207,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'ctbc_flying_oyster',
+    roster: {
+      top: 'Rest',
+      jungle: 'Shad0w',
+      mid: 'Pout',
+      bot: 'Doggo',
+      support: 'Kino',
+    },
   },
 
   // LCS (NA)
@@ -142,6 +226,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'team_liquid',
+    roster: {
+      top: 'Morgan',
+      jungle: 'Josedeodo',
+      mid: 'Quid',
+      bot: 'Yeon',
+      support: 'CoreJJ',
+    },
   },
   {
     id: 'lyon',
@@ -152,6 +243,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'lyon',
+    roster: {
+      top: 'Dhokla',
+      jungle: 'Inspired',
+      mid: 'Saint',
+      bot: 'Berserker',
+      support: 'Isles',
+    },
   },
 
   // CBLOL (Brazil)
@@ -164,6 +262,13 @@ export const BASE_15_TEAMS: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'cblol_seed_2',
+    roster: {
+      top: 'Guigo',
+      jungle: 'Tatu',
+      mid: 'Tutsz',
+      bot: 'Ayu',
+      support: 'JoJo',
+    },
   },
 ];
 
@@ -180,6 +285,13 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'Karmine_Corp',
+    roster: {
+      top: 'Canna',
+      jungle: 'Yike',
+      mid: 'kyeahoo',
+      bot: 'Caliste',
+      support: 'Busio',
+    },
   },
   {
     id: 'mvk',
@@ -190,6 +302,13 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'MVK_Esport',
+    roster: {
+      top: 'Kratos',
+      jungle: 'Gury',
+      mid: 'Chika',
+      bot: 'Harky',
+      support: 'SiuLoong',
+    },
   },
   {
     id: 'c9',
@@ -200,6 +319,13 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'cloud9',
+    roster: {
+      top: 'Thanatos',
+      jungle: 'Blaber',
+      mid: 'APA',
+      bot: 'Tactical / Zven',
+      support: 'Loki / Vulcan',
+    },
   },
   {
     id: 'cblol_pi',
@@ -210,6 +336,13 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     losses: 0,
     pastOpponents: [],
     imageKey: 'CBLOL_play_in',
+    roster: {
+      top: 'Zest',
+      jungle: 'Curse',
+      mid: 'Feisty',
+      bot: 'Duduhh',
+      support: 'Ackerman',
+    },
   },
 ];
 

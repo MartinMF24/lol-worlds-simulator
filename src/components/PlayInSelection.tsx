@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Team } from '../types/swiss';
 import { PLAY_IN_CANDIDATES } from '../data/teams';
 import { getTeamImage } from '../data/teamImages';
+import { TeamRosterTooltip } from './TeamRosterTooltip';
 import { ArrowRight, Trophy } from 'lucide-react';
 
 interface PlayInSelectionProps {
@@ -31,44 +32,45 @@ export const PlayInSelection: React.FC<PlayInSelectionProps> = ({ onSelectTeam }
       {/* 4 Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 max-w-4xl w-full">
         {PLAY_IN_CANDIDATES.map((candidate) => (
-          <button
-            key={candidate.id}
-            type="button"
-            onClick={() => onSelectTeam(candidate)}
-            className="group flex flex-col items-center p-5 rounded-lg bg-zinc-900/60 border border-zinc-750 hover:border-zinc-500 hover:bg-zinc-850/80 transition-all duration-200 cursor-pointer text-center relative focus:outline-none focus:ring-1 focus:ring-amber-400/50"
-          >
-            {/* Team Crest */}
-            <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center p-2 mb-3.5 border border-zinc-700/80 group-hover:border-zinc-500 group-hover:scale-105 transition-all duration-200 relative">
-              <Image
-                src={getTeamImage(candidate.imageKey)}
-                alt={candidate.name}
-                width={48}
-                height={48}
-                className="w-full h-full object-contain"
-              />
-            </div>
+          <TeamRosterTooltip key={candidate.id} team={candidate}>
+            <button
+              type="button"
+              onClick={() => onSelectTeam(candidate)}
+              className="w-full group flex flex-col items-center p-5 rounded-lg bg-zinc-900/60 border border-zinc-750 hover:border-zinc-500 hover:bg-zinc-850/80 transition-all duration-200 cursor-pointer text-center relative focus:outline-none focus:ring-1 focus:ring-amber-400/50"
+            >
+              {/* Team Crest */}
+              <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center p-2 mb-3.5 border border-zinc-700/80 group-hover:border-zinc-500 group-hover:scale-105 transition-all duration-200 relative">
+                <Image
+                  src={getTeamImage(candidate.imageKey)}
+                  alt={candidate.name}
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-contain"
+                />
+              </div>
 
-            {/* Team Name */}
-            <span className="text-sm font-semibold text-zinc-100 group-hover:text-white transition-colors truncate max-w-full">
-              {candidate.name}
-            </span>
-
-            {/* Region & Seed Pill */}
-            <div className="flex items-center gap-1.5 mt-1.5 text-xs">
-              <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] font-mono text-zinc-300 border border-zinc-700">
-                {candidate.region}
+              {/* Team Name */}
+              <span className="text-sm font-semibold text-zinc-100 group-hover:text-white transition-colors truncate max-w-full">
+                {candidate.name}
               </span>
-              <span className="text-[11px] text-zinc-400 font-normal">
-                Seed 4
-              </span>
-            </div>
 
-            {/* Subtle Action Hint */}
-            <div className="mt-4 text-[11px] text-zinc-400 group-hover:text-amber-400 transition-colors font-medium flex items-center gap-1">
-              <span>Clasificar</span>
-              <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </div>
-          </button>
+              {/* Region & Seed Pill */}
+              <div className="flex items-center gap-1.5 mt-1.5 text-xs">
+                <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] font-mono text-zinc-300 border border-zinc-700">
+                  {candidate.region}
+                </span>
+                <span className="text-[11px] text-zinc-400 font-normal">
+                  Seed 4
+                </span>
+              </div>
+
+              {/* Subtle Action Hint */}
+              <div className="mt-4 text-[11px] text-zinc-400 group-hover:text-amber-400 transition-colors font-medium flex items-center gap-1">
+                <span>Clasificar</span>
+                <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </div>
+            </button>
+          </TeamRosterTooltip>
         ))}
       </div>
     </div>

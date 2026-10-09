@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Team } from '../../types/swiss';
 import { getTeamImage } from '../../data/teamImages';
+import { TeamRosterTooltip } from '../TeamRosterTooltip';
 import { Trophy } from 'lucide-react';
 
 interface ChampionCardProps {
@@ -24,7 +25,8 @@ export const ChampionCard: React.FC<ChampionCardProps> = ({ champion }) => {
   }
 
   return (
-    <div className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 p-4 flex flex-col items-center text-center shadow-sm">
+    <TeamRosterTooltip team={champion}>
+      <div className="w-full rounded-xl border border-amber-400/50 bg-amber-400/10 p-4 flex flex-col items-center text-center shadow-sm cursor-default">
       {/* Icon & Label */}
       <div className="flex items-center gap-1.5 text-amber-400 mb-2">
         <Trophy className="w-4 h-4" />
@@ -55,6 +57,7 @@ export const ChampionCard: React.FC<ChampionCardProps> = ({ champion }) => {
         Récord en Suizo: {champion.wins}-{champion.losses}
       </span>
     </div>
+  </TeamRosterTooltip>
   );
 };
 

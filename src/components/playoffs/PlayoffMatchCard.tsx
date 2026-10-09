@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { PlayoffMatch } from '../../types/playoffs';
 import { Team } from '../../types/swiss';
 import { getTeamImage } from '../../data/teamImages';
+import { TeamRosterTooltip } from '../TeamRosterTooltip';
 import { Check } from 'lucide-react';
 
 interface PlayoffMatchCardProps {
@@ -29,17 +30,18 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
     const isLoser = match.winnerId !== null && !isWinner;
 
     return (
-      <button
-        type="button"
-        onClick={() => onSelectWinner(match.id, team.id)}
-        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors duration-150 ${
-          isWinner
-            ? 'bg-zinc-800 text-white font-medium border border-amber-400/60 shadow-sm'
-            : isLoser
-            ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40'
-            : 'text-zinc-200 hover:bg-zinc-800/70 border border-transparent'
-        }`}
-      >
+      <TeamRosterTooltip team={team}>
+        <button
+          type="button"
+          onClick={() => onSelectWinner(match.id, team.id)}
+          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors duration-150 ${
+            isWinner
+              ? 'bg-zinc-800 text-white font-medium border border-amber-400/60 shadow-sm'
+              : isLoser
+              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40'
+              : 'text-zinc-200 hover:bg-zinc-800/70 border border-transparent'
+          }`}
+        >
         {/* Left: Avatar & Team Info */}
         <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
           <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
@@ -75,6 +77,7 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
           )}
         </div>
       </button>
+    </TeamRosterTooltip>
     );
   };
 
