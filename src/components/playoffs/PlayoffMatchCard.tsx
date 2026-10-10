@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import { PlayoffMatch } from '../../types/playoffs';
 import { Team } from '../../types/swiss';
 import { getTeamImage } from '../../data/teamImages';
 import { TeamRosterTooltip } from '../TeamRosterTooltip';
+import { sanitizeString } from '../../utils/security';
 import { Check } from 'lucide-react';
 
 interface PlayoffMatchCardProps {
@@ -12,7 +13,7 @@ interface PlayoffMatchCardProps {
   onSelectWinner: (matchId: string, winnerId: string) => void;
 }
 
-export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
+export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = memo(({
   match,
   matchTitle,
   onSelectWinner,
@@ -20,7 +21,7 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
   const renderTeamRow = (team: Team | null, isTop: boolean) => {
     if (!team) {
       return (
-        <div className="w-full h-8 flex items-center justify-between px-2.5 py-1.5 rounded text-left text-zinc-600 bg-zinc-950/40 border border-dashed border-zinc-800/80">
+        <div className="w-full h-8 flex items-center justify-between px-2.5 rounded text-left text-zinc-600 bg-zinc-950/40 border border-dashed border-zinc-800/80">
           <span className="text-[11px] font-normal italic">Por definir</span>
         </div>
       );
@@ -34,50 +35,55 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
         <button
           type="button"
           onClick={() => onSelectWinner(match.id, team.id)}
-          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left transition-colors duration-150 ${
+          className={`w-full h-8 flex items-center justify-between px-2.5 rounded text-left transition-colors duration-150 border ${
             isWinner
-              ? 'bg-zinc-800 text-white font-medium border border-amber-400/60 shadow-sm'
+              ? 'bg-zinc-800 text-white font-medium border-amber-400/60 shadow-sm'
               : isLoser
-              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40'
-              : 'text-zinc-200 hover:bg-zinc-800/70 border border-transparent'
+              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              : 'text-zinc-200 hover:bg-zinc-800/70 border-transparent'
           }`}
         >
-        {/* Left: Avatar & Team Info */}
-        <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
-          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
-            <Image
-              src={getTeamImage(team.imageKey)}
-              alt={team.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
+          {/* Left: Avatar & Team Info */}
+          <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
+            <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
+              <Image
+                src={getTeamImage(team.imageKey)}
+                alt={team.name}
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-xs font-semibold text-white truncate block">
+                {sanitizeString(team.name)}
+              </span>
+              <span className="text-[10px] text-zinc-400 flex-shrink-0 font-normal">
+                {team.region}
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-xs font-semibold text-white truncate block">
-              {team.name}
+          {/* Right: Swiss Record & Checkmark */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-[10px] font-mono text-zinc-400">
+              {team.wins}-{team.losses}
             </span>
-            <span className="text-[10px] text-zinc-400 flex-shrink-0 font-normal">
-              {team.region}
-            </span>
-          </div>
-        </div>
 
-        {/* Right: Swiss Record & Checkmark */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="text-[10px] font-mono text-zinc-400">
-            {team.wins}-{team.losses}
-          </span>
-
-          {isWinner && (
-            <span className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-amber-400 bg-amber-400/20">
+            {/* Fixed-width checkmark container so row dimensions never shift */}
+            <span
+              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 transition-opacity duration-150 ${
+                isWinner
+                  ? 'text-amber-400 bg-amber-400/20 opacity-100'
+                  : 'opacity-0 pointer-events-none'
+              }`}
+            >
               <Check className="w-2.5 h-2.5 stroke-[3]" />
             </span>
-          )}
-        </div>
-      </button>
-    </TeamRosterTooltip>
+          </div>
+        </button>
+      </TeamRosterTooltip>
     );
   };
 
@@ -104,5 +110,6 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = ({
       </div>
     </div>
   );
-};
+});
 
+PlayoffMatchCard.displayName = 'PlayoffMatchCard';

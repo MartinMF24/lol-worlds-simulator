@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Match, Round } from '../types/swiss';
 import { RecordPoolGroup } from './RecordPoolGroup';
 import { MatchCard } from './MatchCard';
@@ -15,7 +15,7 @@ interface RoundColumnProps {
   onRerollRound?: () => void;
 }
 
-export const RoundColumn: React.FC<RoundColumnProps> = ({
+export const RoundColumn: React.FC<RoundColumnProps> = memo(({
   roundNumber,
   currentRound,
   isFinished,
@@ -35,21 +35,24 @@ export const RoundColumn: React.FC<RoundColumnProps> = ({
     ? activeMatches || []
     : [];
 
-  // Group matches by poolRecord
-  const poolsMap: Record<string, Match[]> = {};
-  matches.forEach((m) => {
-    const key = m.poolRecord || '0-0';
-    if (!poolsMap[key]) poolsMap[key] = [];
-    poolsMap[key].push(m);
-  });
+  // Group matches by poolRecord with memoization
+  const { poolsMap, sortedPoolKeys } = useMemo(() => {
+    const map: Record<string, Match[]> = {};
+    matches.forEach((m) => {
+      const key = m.poolRecord || '0-0';
+      if (!map[key]) map[key] = [];
+      map[key].push(m);
+    });
 
-  // Sort pool keys so highest wins are at top (e.g., 2-0 -> 1-1 -> 0-2)
-  const sortedPoolKeys = Object.keys(poolsMap).sort((a, b) => {
-    const [wA, lA] = a.split('-').map(Number);
-    const [wB, lB] = b.split('-').map(Number);
-    if (wB !== wA) return wB - wA;
-    return lA - lB;
-  });
+    const keys = Object.keys(map).sort((a, b) => {
+      const [wA, lA] = a.split('-').map(Number);
+      const [wB, lB] = b.split('-').map(Number);
+      if (wB !== wA) return wB - wA;
+      return lA - lB;
+    });
+
+    return { poolsMap: map, sortedPoolKeys: keys };
+  }, [matches]);
 
   return (
     <div
@@ -115,9 +118,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = ({
                 match={match}
                 selectedWinnerId={selectedWinners[match.id]}
                 isReadOnly={isPast}
-                onSelectWinner={(winnerId) =>
-                  onSelectWinner && onSelectWinner(match.id, winnerId)
-                }
+                onSelectWinner={onSelectWinner}
               />
             ))}
           </div>
@@ -142,4 +143,31 @@ export const RoundColumn: React.FC<RoundColumnProps> = ({
       </div>
     </div>
   );
-};
+}, (prev, next) => {
+  // If basic round identifiers or tournament states changed, re-render
+  if (
+    prev.roundNumber !== next.roundNumber ||
+    prev.currentRound !== next.currentRound ||
+    prev.isFinished !== next.isFinished ||
+    prev.roundData !== next.roundData
+  ) {
+    return false;
+  }
+
+  // If this column is the active round, re-render only if active matches or winners changed
+  const isActive = next.roundNumber === next.currentRound && !next.isFinished;
+  if (isActive) {
+    return (
+      prev.activeMatches === next.activeMatches &&
+      prev.selectedWinners === next.selectedWinners &&
+      prev.onSelectWinner === next.onSelectWinner &&
+      prev.onRerollRound === next.onRerollRound
+    );
+  }
+
+  // Past and future columns are completely invariant to active match winner toggles
+  return true;
+});
+
+RoundColumn.displayName = 'RoundColumn';
+

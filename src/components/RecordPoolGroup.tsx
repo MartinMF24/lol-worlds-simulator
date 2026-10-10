@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Match } from '../types/swiss';
 import { MatchCard } from './MatchCard';
 
@@ -10,7 +10,7 @@ interface RecordPoolGroupProps {
   onSelectWinner?: (matchId: string, winnerId: string) => void;
 }
 
-export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = ({
+export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
   poolRecord,
   matches,
   selectedWinners,
@@ -60,12 +60,13 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = ({
             match={match}
             selectedWinnerId={selectedWinners[match.id]}
             isReadOnly={isReadOnly}
-            onSelectWinner={(winnerId) =>
-              onSelectWinner && onSelectWinner(match.id, winnerId)
-            }
+            onSelectWinner={onSelectWinner}
           />
         ))}
       </div>
     </div>
   );
-};
+});
+
+RecordPoolGroup.displayName = 'RecordPoolGroup';
+

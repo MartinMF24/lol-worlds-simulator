@@ -1,18 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import { Team } from '../types/swiss';
 import { PLAY_IN_CANDIDATES } from '../data/teams';
 import { getTeamImage } from '../data/teamImages';
 import { TeamRosterTooltip } from './TeamRosterTooltip';
+import { sanitizeString } from '../utils/security';
 import { ArrowRight, Trophy } from 'lucide-react';
 
 interface PlayInSelectionProps {
   onSelectTeam: (team: Team) => void;
 }
 
-export const PlayInSelection: React.FC<PlayInSelectionProps> = ({ onSelectTeam }) => {
+export const PlayInSelection: React.FC<PlayInSelectionProps> = memo(({ onSelectTeam }) => {
   return (
     <div className="w-full min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-4 py-8">
       {/* Header Info */}
@@ -51,7 +52,7 @@ export const PlayInSelection: React.FC<PlayInSelectionProps> = ({ onSelectTeam }
 
               {/* Team Name */}
               <span className="text-sm font-semibold text-zinc-100 group-hover:text-white transition-colors truncate max-w-full">
-                {candidate.name}
+                {sanitizeString(candidate.name)}
               </span>
 
               {/* Region & Seed Pill */}
@@ -75,5 +76,7 @@ export const PlayInSelection: React.FC<PlayInSelectionProps> = ({ onSelectTeam }
       </div>
     </div>
   );
-};
+});
+
+PlayInSelection.displayName = 'PlayInSelection';
 

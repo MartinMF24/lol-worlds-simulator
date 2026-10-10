@@ -27,7 +27,11 @@ export function usePlayoffsSimulation(qualifiedTeams: Team[]): UsePlayoffsSimula
 
   const initializeBracket = useCallback((teams: Team[]) => {
     if (teams && teams.length === 8) {
-      setBracket(generatePlayoffsBracket(teams));
+      try {
+        setBracket(generatePlayoffsBracket(teams));
+      } catch (err) {
+        console.error('[usePlayoffsSimulation] Error initializing bracket:', err);
+      }
     }
   }, []);
 
@@ -40,17 +44,27 @@ export function usePlayoffsSimulation(qualifiedTeams: Team[]): UsePlayoffsSimula
   // Reroll quarterfinals draw
   const reroll = useCallback(() => {
     if (!canReroll || !qualifiedTeams || qualifiedTeams.length !== 8) return;
-    setBracket(generatePlayoffsBracket(qualifiedTeams));
+    try {
+      setBracket(generatePlayoffsBracket(qualifiedTeams));
+    } catch (err) {
+      console.error('[usePlayoffsSimulation] Error rerolling playoffs:', err);
+    }
   }, [canReroll, qualifiedTeams]);
 
   // Reset entire playoffs
   const resetPlayoffs = useCallback(() => {
     if (!qualifiedTeams || qualifiedTeams.length !== 8) return;
-    setBracket(generatePlayoffsBracket(qualifiedTeams));
+    try {
+      setBracket(generatePlayoffsBracket(qualifiedTeams));
+    } catch (err) {
+      console.error('[usePlayoffsSimulation] Error resetting playoffs:', err);
+    }
   }, [qualifiedTeams]);
 
   // Select winner for a playoff match with reactive advancement and cascade cleanup
   const selectWinner = useCallback((matchId: string, winnerId: string) => {
+    if (!winnerId) return;
+
     setBracket((prev) => {
       if (!prev) return null;
 
@@ -64,7 +78,12 @@ export function usePlayoffsSimulation(qualifiedTeams: Team[]): UsePlayoffsSimula
       const qIndex = nextQuarters.findIndex((m) => m.id === matchId);
       if (qIndex !== -1) {
         const qMatch = nextQuarters[qIndex];
-        const winningTeam = qMatch.team1?.id === winnerId ? qMatch.team1 : qMatch.team2;
+        const winningTeam =
+          qMatch.team1?.id === winnerId
+            ? qMatch.team1
+            : qMatch.team2?.id === winnerId
+            ? qMatch.team2
+            : null;
         if (!winningTeam) return prev;
 
         const prevWinnerId = qMatch.winnerId;
@@ -109,7 +128,12 @@ export function usePlayoffsSimulation(qualifiedTeams: Team[]): UsePlayoffsSimula
       const sIndex = nextSemis.findIndex((m) => m.id === matchId);
       if (sIndex !== -1) {
         const sMatch = nextSemis[sIndex];
-        const winningTeam = sMatch.team1?.id === winnerId ? sMatch.team1 : sMatch.team2;
+        const winningTeam =
+          sMatch.team1?.id === winnerId
+            ? sMatch.team1
+            : sMatch.team2?.id === winnerId
+            ? sMatch.team2
+            : null;
         if (!winningTeam) return prev;
 
         const prevWinnerId = sMatch.winnerId;
@@ -140,7 +164,12 @@ export function usePlayoffsSimulation(qualifiedTeams: Team[]): UsePlayoffsSimula
 
       // 3. Check if match is Final
       if (nextFinal.id === matchId) {
-        const winningTeam = nextFinal.team1?.id === winnerId ? nextFinal.team1 : nextFinal.team2;
+        const winningTeam =
+          nextFinal.team1?.id === winnerId
+            ? nextFinal.team1
+            : nextFinal.team2?.id === winnerId
+            ? nextFinal.team2
+            : null;
         if (!winningTeam) return prev;
 
         nextFinal.winnerId = winnerId;

@@ -36,9 +36,19 @@ export const teamImages: Record<string, string> = {
 };
 
 export const getTeamImage = (imageKey: string): string => {
-  return (
-    teamImages[imageKey] ||
-    teamImages[imageKey.toLowerCase()] ||
-    '/assets/Gen.G.jpg'
-  );
+  if (typeof imageKey !== 'string') return '/assets/Gen.G.jpg';
+  const cleanKey = imageKey.trim();
+
+  if (Object.prototype.hasOwnProperty.call(teamImages, cleanKey)) {
+    const val = teamImages[cleanKey];
+    if (typeof val === 'string') return val;
+  }
+
+  const lowerKey = cleanKey.toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(teamImages, lowerKey)) {
+    const val = teamImages[lowerKey];
+    if (typeof val === 'string') return val;
+  }
+
+  return '/assets/Gen.G.jpg';
 };

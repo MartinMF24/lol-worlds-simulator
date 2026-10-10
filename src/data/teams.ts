@@ -15,7 +15,7 @@ export const BASE_15_TEAMS: Team[] = [
     pastOpponents: [],
     imageKey: 'anyones_legend',
     roster: {
-      top: 'Flandre',
+      top: 'Breathe',
       jungle: 'Tarzan',
       mid: 'Shanks',
       bot: 'Hope',
@@ -32,7 +32,7 @@ export const BASE_15_TEAMS: Team[] = [
     pastOpponents: [],
     imageKey: 'bilibili_gaming',
     roster: {
-      top: 'Bin',
+      top: 'Bin / Flandre',
       jungle: 'Xun',
       mid: 'Knight',
       bot: 'Viper',
@@ -50,7 +50,7 @@ export const BASE_15_TEAMS: Team[] = [
     imageKey: 'top_esports',
     roster: {
       top: '369',
-      jungle: 'Tian',
+      jungle: 'Tian / Zuian',
       mid: 'Creme',
       bot: 'JackeyLove',
       support: 'Zhuo',
@@ -244,7 +244,7 @@ export const BASE_15_TEAMS: Team[] = [
     pastOpponents: [],
     imageKey: 'lyon',
     roster: {
-      top: 'Dhokla',
+      top: 'Dhokla / Castle',
       jungle: 'Inspired',
       mid: 'Saint',
       bot: 'Berserker',
@@ -304,7 +304,7 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     imageKey: 'MVK_Esport',
     roster: {
       top: 'Kratos',
-      jungle: 'Gury',
+      jungle: 'Gury / SanSan',
       mid: 'Chika',
       bot: 'Harky',
       support: 'SiuLoong',
@@ -322,9 +322,9 @@ export const PLAY_IN_CANDIDATES: Team[] = [
     roster: {
       top: 'Thanatos',
       jungle: 'Blaber',
-      mid: 'APA',
+      mid: 'APA / Loki',
       bot: 'Tactical / Zven',
-      support: 'Loki / Vulcan',
+      support: 'Vulcan',
     },
   },
   {

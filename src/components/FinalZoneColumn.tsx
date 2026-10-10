@@ -1,20 +1,27 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import Image from 'next/image';
 import { Team } from '../types/swiss';
 import { getTeamImage } from '../data/teamImages';
 import { TeamRosterTooltip } from './TeamRosterTooltip';
+import { sanitizeString } from '../utils/security';
 
 interface FinalZoneColumnProps {
   qualifiedTeams: Team[];
   eliminatedTeams: Team[];
 }
 
-export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
+export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = memo(({
   qualifiedTeams,
   eliminatedTeams,
 }) => {
-  const sortedQualified = [...qualifiedTeams].sort((a, b) => a.losses - b.losses);
-  const sortedEliminated = [...eliminatedTeams].sort((a, b) => b.wins - a.wins);
+  const sortedQualified = useMemo(
+    () => [...qualifiedTeams].sort((a, b) => a.losses - b.losses),
+    [qualifiedTeams]
+  );
+  const sortedEliminated = useMemo(
+    () => [...eliminatedTeams].sort((a, b) => b.wins - a.wins),
+    [eliminatedTeams]
+  );
 
   const renderSlot = (team: Team | undefined, isQualified: boolean, index: number) => {
     if (!team) {
@@ -34,40 +41,40 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
         <div
           className="h-7 rounded border border-zinc-750 bg-zinc-900/80 px-2 flex items-center justify-between hover:border-zinc-650 transition-colors duration-150 cursor-default"
         >
-        {/* Team Details */}
-        <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
-          <span className="text-[10px] font-mono text-zinc-400 font-medium w-3.5">
-            #{index + 1}
-          </span>
-          <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
-            <Image
-              src={getTeamImage(team.imageKey)}
-              alt={team.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex items-center gap-1 min-w-0">
-            <span className="text-[11px] font-semibold text-white truncate">
-              {team.name}
+          {/* Team Details */}
+          <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
+            <span className="text-[10px] font-mono text-zinc-400 font-medium w-3.5">
+              #{index + 1}
             </span>
-            <span className="text-[9px] text-zinc-400 font-normal">
-              {team.region}
-            </span>
+            <div className="w-4 h-4 rounded overflow-hidden bg-zinc-800 flex-shrink-0 border border-zinc-700 relative">
+              <Image
+                src={getTeamImage(team.imageKey)}
+                alt={team.name}
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="text-[11px] font-semibold text-white truncate">
+                {sanitizeString(team.name)}
+              </span>
+              <span className="text-[9px] text-zinc-400 font-normal">
+                {team.region}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Final Record */}
-        <span
-          className={`text-[11px] font-mono font-bold flex-shrink-0 ${
-            isQualified ? 'text-emerald-400' : 'text-rose-400'
-          }`}
-        >
-          {team.wins}-{team.losses}
-        </span>
-      </div>
-    </TeamRosterTooltip>
+          {/* Final Record */}
+          <span
+            className={`text-[11px] font-mono font-bold flex-shrink-0 ${
+              isQualified ? 'text-emerald-400' : 'text-rose-400'
+            }`}
+          >
+            {team.wins}-{team.losses}
+          </span>
+        </div>
+      </TeamRosterTooltip>
     );
   };
 
@@ -116,4 +123,7 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = ({
       </div>
     </div>
   );
-};
+});
+
+FinalZoneColumn.displayName = 'FinalZoneColumn';
+

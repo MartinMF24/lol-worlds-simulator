@@ -60,13 +60,24 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     setIsFinished(false);
   }, []);
 
-  // Handler to select a winner for a given match
+  // Handler to select a winner for a given match with strict validation
   const selectWinner = useCallback((matchId: string, winnerId: string) => {
-    setSelectedWinners((prev) => {
-      return {
+    setActiveMatches((currentActive) => {
+      const targetMatch = currentActive.find((m) => m.id === matchId);
+      if (!targetMatch) return currentActive;
+
+      // Defensive validation: winner MUST be one of the two competing teams
+      if (targetMatch.team1.id !== winnerId && targetMatch.team2.id !== winnerId) {
+        console.warn(`[useSwissSimulation] Invalid winnerId: ${winnerId} for match ${matchId}`);
+        return currentActive;
+      }
+
+      setSelectedWinners((prev) => ({
         ...prev,
         [matchId]: winnerId,
-      };
+      }));
+
+      return currentActive;
     });
   }, []);
 
@@ -86,77 +97,90 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
   const confirmRound = useCallback(() => {
     if (!isRoundComplete) return;
 
-    // 1. Mark winners in matches
-    const completedMatches: Match[] = activeMatches.map((m) => ({
-      ...m,
-      winnerId: selectedWinners[m.id],
-    }));
+    try {
+      // 1. Mark winners in matches with validation
+      const completedMatches: Match[] = activeMatches.map((m) => {
+        const winnerId = selectedWinners[m.id];
+        const validWinnerId =
+          winnerId === m.team1.id || winnerId === m.team2.id ? winnerId : m.team1.id;
+        return {
+          ...m,
+          winnerId: validWinnerId,
+        };
+      });
 
-    // 2. Update team records and past opponents immutably
-    const updatedTeams: Team[] = teams.map((team) => {
-      const match = completedMatches.find(
-        (m) => m.team1.id === team.id || m.team2.id === team.id
-      );
-      if (!match) return team;
+      // 2. Update team records and past opponents immutably
+      const updatedTeams: Team[] = teams.map((team) => {
+        const match = completedMatches.find(
+          (m) => m.team1.id === team.id || m.team2.id === team.id
+        );
+        if (!match) return team;
 
-      const opponent = match.team1.id === team.id ? match.team2 : match.team1;
-      const won = match.winnerId === team.id;
+        const opponent = match.team1.id === team.id ? match.team2 : match.team1;
+        const won = match.winnerId === team.id;
 
-      return {
-        ...team,
-        wins: won ? team.wins + 1 : team.wins,
-        losses: won ? team.losses : team.losses + 1,
-        pastOpponents: [...team.pastOpponents, opponent.id],
+        return {
+          ...team,
+          wins: won ? team.wins + 1 : team.wins,
+          losses: won ? team.losses : team.losses + 1,
+          pastOpponents: [...team.pastOpponents, opponent.id],
+        };
+      });
+
+      // 3. Save completed round to history
+      const completedRound: Round = {
+        roundNumber: currentRound,
+        matches: completedMatches,
+        isCompleted: true,
       };
-    });
+      const newRounds = [...rounds, completedRound];
 
-    // 3. Save completed round to history
-    const completedRound: Round = {
-      roundNumber: currentRound,
-      matches: completedMatches,
-      isCompleted: true,
-    };
-    const newRounds = [...rounds, completedRound];
+      // 4. Check if simulation is complete (8 qualified & 8 eliminated)
+      const newQualified = updatedTeams.filter((t) => t.wins >= 3);
+      const newEliminated = updatedTeams.filter((t) => t.losses >= 3);
 
-    // 4. Check if simulation is complete (8 qualified & 8 eliminated)
-    const newQualified = updatedTeams.filter((t) => t.wins >= 3);
-    const newEliminated = updatedTeams.filter((t) => t.losses >= 3);
+      if (newQualified.length === 8 && newEliminated.length === 8) {
+        setTeams(updatedTeams);
+        setRounds(newRounds);
+        setActiveMatches([]);
+        setSelectedWinners({});
+        setIsFinished(true);
+        return;
+      }
 
-    if (newQualified.length === 8 && newEliminated.length === 8) {
+      if (currentRound >= 5) {
+        setTeams(updatedTeams);
+        setRounds(newRounds);
+        setActiveMatches([]);
+        setSelectedWinners({});
+        setIsFinished(true);
+        return;
+      }
+
+      // 5. Draw next round safely
+      const nextRoundNumber = currentRound + 1;
+      const nextMatches = drawSwissRound(updatedTeams, nextRoundNumber);
+
       setTeams(updatedTeams);
       setRounds(newRounds);
-      setActiveMatches([]);
+      setCurrentRound(nextRoundNumber);
+      setActiveMatches(nextMatches);
       setSelectedWinners({});
-      setIsFinished(true);
-      return;
+    } catch (err) {
+      console.error('[useSwissSimulation] Error during round confirmation:', err);
     }
-
-    if (currentRound >= 5) {
-      setTeams(updatedTeams);
-      setRounds(newRounds);
-      setActiveMatches([]);
-      setSelectedWinners({});
-      setIsFinished(true);
-      return;
-    }
-
-    // 5. Draw next round
-    const nextRoundNumber = currentRound + 1;
-    const nextMatches = drawSwissRound(updatedTeams, nextRoundNumber);
-
-    setTeams(updatedTeams);
-    setRounds(newRounds);
-    setCurrentRound(nextRoundNumber);
-    setActiveMatches(nextMatches);
-    setSelectedWinners({});
   }, [activeMatches, selectedWinners, isRoundComplete, teams, currentRound, rounds]);
 
-  // Re-draw current active round pairings
+  // Re-draw current active round pairings safely
   const rerollRound = useCallback(() => {
     if (teams.length !== 16 || isFinished) return;
-    const newMatches = drawSwissRound(teams, currentRound);
-    setActiveMatches(newMatches);
-    setSelectedWinners({});
+    try {
+      const newMatches = drawSwissRound(teams, currentRound);
+      setActiveMatches(newMatches);
+      setSelectedWinners({});
+    } catch (err) {
+      console.error('[useSwissSimulation] Error during round reroll:', err);
+    }
   }, [teams, currentRound, isFinished]);
 
   // Reset entire tournament back to play-in selection

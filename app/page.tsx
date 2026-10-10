@@ -8,6 +8,7 @@ import { RoundColumn } from '../src/components/RoundColumn';
 import { FinalZoneColumn } from '../src/components/FinalZoneColumn';
 import { PlayInSelection } from '../src/components/PlayInSelection';
 import { SplashScreen } from '../src/components/SplashScreen';
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { Team } from '../src/types/swiss';
 
 // Lazy-load Playoffs completely so its code, draw algorithm and components
@@ -92,52 +93,54 @@ export default function WorldsSimulatorPage() {
 
       {/* Main View Area */}
       <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-5 overflow-x-auto flex flex-col">
-        {isPreparing ? (
-          /* Splash screen while preparing Round 1 draw */
-          <SplashScreen message="Preparando sorteo de Ronda 1..." />
-        ) : !selectedPlayInTeam ? (
-          /* Step 1: Initial Play-in Selection View */
-          <PlayInSelection onSelectTeam={handleSelectPlayIn} />
-        ) : activeTab === 'swiss' ? (
-          /* Step 2: Swiss Stage 6 Adaptable Columns */
-          <div className="grid grid-cols-6 gap-2.5 lg:gap-3 xl:gap-3.5 w-full min-w-[1020px]">
-            {/* Rounds 1 to 5 */}
-            {[1, 2, 3, 4, 5].map((roundNum) => {
-              const completedRoundData = rounds.find((r) => r.roundNumber === roundNum);
+        <ErrorBoundary onReset={handleResetTournament}>
+          {isPreparing ? (
+            /* Splash screen while preparing Round 1 draw */
+            <SplashScreen message="Preparando sorteo de Ronda 1..." />
+          ) : !selectedPlayInTeam ? (
+            /* Step 1: Initial Play-in Selection View */
+            <PlayInSelection onSelectTeam={handleSelectPlayIn} />
+          ) : activeTab === 'swiss' ? (
+            /* Step 2: Swiss Stage 6 Adaptable Columns */
+            <div className="grid grid-cols-6 gap-2.5 lg:gap-3 xl:gap-3.5 w-full min-w-[1020px]">
+              {/* Rounds 1 to 5 */}
+              {[1, 2, 3, 4, 5].map((roundNum) => {
+                const completedRoundData = rounds.find((r) => r.roundNumber === roundNum);
 
-              return (
-                <RoundColumn
-                  key={roundNum}
-                  roundNumber={roundNum}
-                  currentRound={currentRound}
-                  isFinished={isSwissFinished}
-                  roundData={completedRoundData}
-                  activeMatches={activeMatches}
-                  selectedWinners={selectedWinners}
-                  onSelectWinner={selectSwissWinner}
-                  onRerollRound={rerollSwissRound}
-                />
-              );
-            })}
+                return (
+                  <RoundColumn
+                    key={roundNum}
+                    roundNumber={roundNum}
+                    currentRound={currentRound}
+                    isFinished={isSwissFinished}
+                    roundData={completedRoundData}
+                    activeMatches={activeMatches}
+                    selectedWinners={selectedWinners}
+                    onSelectWinner={selectSwissWinner}
+                    onRerollRound={rerollSwissRound}
+                  />
+                );
+              })}
 
-            {/* Column 6: Clasificados (Top) & Eliminados (Underneath) */}
-            <FinalZoneColumn
+              {/* Column 6: Clasificados (Top) & Eliminados (Underneath) */}
+              <FinalZoneColumn
+                qualifiedTeams={qualifiedTeams}
+                eliminatedTeams={eliminatedTeams}
+              />
+            </div>
+          ) : (
+            /* Step 3: Playoffs Stage Dynamically Loaded */
+            <PlayoffsView
               qualifiedTeams={qualifiedTeams}
-              eliminatedTeams={eliminatedTeams}
+              isSwissFinished={isSwissFinished}
+              onBackToSwiss={() => setActiveTab('swiss')}
+              onChampionChange={setHasChampion}
+              onResetRegister={(resetFn) => {
+                playoffsResetRef.current = resetFn;
+              }}
             />
-          </div>
-        ) : (
-          /* Step 3: Playoffs Stage Dynamically Loaded */
-          <PlayoffsView
-            qualifiedTeams={qualifiedTeams}
-            isSwissFinished={isSwissFinished}
-            onBackToSwiss={() => setActiveTab('swiss')}
-            onChampionChange={setHasChampion}
-            onResetRegister={(resetFn) => {
-              playoffsResetRef.current = resetFn;
-            }}
-          />
-        )}
+          )}
+        </ErrorBoundary>
       </main>
     </div>
   );

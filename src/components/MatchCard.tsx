@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import { Match, Team } from '../types/swiss';
 import { getTeamImage } from '../data/teamImages';
 import { TeamRosterTooltip } from './TeamRosterTooltip';
+import { sanitizeString } from '../utils/security';
 import { Check } from 'lucide-react';
 
 interface MatchCardProps {
   match: Match;
   selectedWinnerId?: string | null;
   isReadOnly?: boolean;
-  onSelectWinner?: (winnerId: string) => void;
+  onSelectWinner?: (matchId: string, winnerId: string) => void;
 }
 
-export const MatchCard: React.FC<MatchCardProps> = ({
+export const MatchCard: React.FC<MatchCardProps> = memo(({
   match,
   selectedWinnerId,
   isReadOnly = false,
@@ -30,17 +31,17 @@ export const MatchCard: React.FC<MatchCardProps> = ({
         <button
           type="button"
           disabled={isReadOnly}
-          onClick={() => onSelectWinner && onSelectWinner(team.id)}
-          className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-left transition-colors duration-150 ${
+          onClick={() => onSelectWinner && onSelectWinner(match.id, team.id)}
+          className={`w-full h-8 flex items-center justify-between px-2 rounded text-left transition-colors duration-150 border ${
             isReadOnly
               ? isWinner
-                ? 'bg-zinc-800 text-white font-medium border border-zinc-650'
-                : 'opacity-50 text-zinc-400'
+                ? 'bg-zinc-800 text-white font-medium border-zinc-650'
+                : 'opacity-50 text-zinc-400 border-transparent'
               : isSelectedInActive
-              ? 'bg-amber-400/15 text-white border border-amber-400 shadow-sm'
+              ? 'bg-amber-400/15 text-white font-medium border-amber-400 shadow-sm'
               : isLoser
-              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40'
-              : 'text-zinc-200 hover:bg-zinc-800/70 border border-transparent'
+              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              : 'text-zinc-200 hover:bg-zinc-800/70 border-transparent'
           }`}
         >
           {/* Left: Avatar & Team Info */}
@@ -57,7 +58,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
 
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-[11px] sm:text-xs font-semibold text-white truncate block">
-                {team.name}
+                {sanitizeString(team.name)}
               </span>
               <span className="text-[9px] text-zinc-400 flex-shrink-0 font-normal">
                 {team.region}
@@ -71,17 +72,18 @@ export const MatchCard: React.FC<MatchCardProps> = ({
               {team.wins}-{team.losses}
             </span>
 
-            {isWinner && (
-              <span
-                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${
-                  isReadOnly
-                    ? 'text-zinc-200 bg-zinc-700'
-                    : 'text-amber-400 bg-amber-400/20'
-                }`}
-              >
-                <Check className="w-2.5 h-2.5 stroke-[3]" />
-              </span>
-            )}
+            {/* Fixed-width checkmark container so row dimensions never shift */}
+            <span
+              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 transition-opacity duration-150 ${
+                isWinner
+                  ? isReadOnly
+                    ? 'text-zinc-200 bg-zinc-700 opacity-100'
+                    : 'text-amber-400 bg-amber-400/20 opacity-100'
+                  : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Check className="w-2.5 h-2.5 stroke-[3]" />
+            </span>
           </div>
         </button>
       </TeamRosterTooltip>
@@ -127,4 +129,6 @@ export const MatchCard: React.FC<MatchCardProps> = ({
       </div>
     </div>
   );
-};
+});
+
+MatchCard.displayName = 'MatchCard';
