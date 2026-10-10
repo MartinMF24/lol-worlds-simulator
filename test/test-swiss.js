@@ -21,14 +21,14 @@ const BASE_15_TEAMS = [
   { id: 'tl', name: 'Team Liquid', region: 'LCS', seed: 1 },
   { id: 'lyon', name: 'Lyon', region: 'LCS', seed: 3 },
   // CBLOL
-  { id: 'cblol2', name: 'Brazil Team 2', region: 'CBLOL', seed: 2 },
+  { id: 'Los', name: 'Los Grandes', region: 'CBLOL', seed: 2 },
 ];
 
 const PLAY_IN_CANDIDATES = [
   { id: 'kc', name: 'Karmine Corp', region: 'LEC', seed: 4 },
   { id: 'mvk', name: 'MVK Esports', region: 'PCS/VCS', seed: 4 },
   { id: 'c9', name: 'Cloud9', region: 'LCS', seed: 4 },
-  { id: 'cblol_pi', name: 'Brazil Play-in Team', region: 'CBLOL', seed: 4 },
+  { id: 'Fur', name: 'Furia', region: 'CBLOL', seed: 4 },
 ];
 
 function shuffle(array) {

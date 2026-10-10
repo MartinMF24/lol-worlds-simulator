@@ -1,7 +1,9 @@
 export const teamImages: Record<string, string> = {
   anyones_legend: '/assets/Anyones_Legend.jpg',
   bilibili_gaming: '/assets/Bilibili_Gaming.jpg',
-  cblol_seed_2: '/assets/CBLOL_seed_2.jpg',
+  cblol_seed_2: '/assets/LOS.jpg',
+  los_grandes: '/assets/LOS.jpg',
+  los: '/assets/LOS.jpg',
   ctbc_flying_oyster: '/assets/CTBC_Flying_Oysterlogo.jpg',
   dplus_kia: '/assets/Dplus_Kia.jpg',
   g2_esport: '/assets/G2_Esport.jpg',
@@ -27,8 +29,8 @@ export const teamImages: Record<string, string> = {
   MVK_Esports: '/assets/MVK_Esports.jpg',
   cloud9: '/assets/Cloud9.jpg',
   Cloud9: '/assets/Cloud9.jpg',
-  cblol_play_in: '/assets/CBLOL_play_in.jpg',
-  CBLOL_play_in: '/assets/CBLOL_play_in.jpg',
+  Furia: '/assets/Furia.jpg',
+  furia: '/assets/Furia.jpg',
 
   // Branding
   worlds: '/assets/Worlds.jpg',
