@@ -29,8 +29,9 @@ export const teamImages: Record<string, string> = {
   MVK_Esports: '/assets/MVK_Esports.jpg',
   cloud9: '/assets/Cloud9.jpg',
   Cloud9: '/assets/Cloud9.jpg',
-  Furia: '/assets/Furia.jpg',
-  furia: '/assets/Furia.jpg',
+  FURIA: '/assets/FURIA.jpg',
+  Furia: '/assets/FURIA.jpg',
+  furia: '/assets/FURIA.jpg',
 
   // Branding
   worlds: '/assets/Worlds.jpg',
