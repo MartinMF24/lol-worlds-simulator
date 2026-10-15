@@ -25,6 +25,7 @@ export interface Team {
   pastOpponents: string[]; // List of opponent team IDs
   imageKey: string;
   roster?: TeamRoster;
+  isPlayInEliminated?: boolean;
 }
 
 export interface Match {
@@ -36,11 +37,14 @@ export interface Match {
   winnerId: string | null;
   isHighMatch?: boolean; // Win advances to playoffs (at 2 wins: 2-0, 2-1, 2-2)
   isLowMatch?: boolean;  // Loss eliminates from tournament (at 2 losses: 0-2, 1-2, 2-2)
+  scheduledTime?: string; // Optional ISO 8601 string, e.g. "2026-10-20T14:00:00-03:00"
+  isOfficialWinner?: boolean; // Whether the winner was decided officially in the real tournament
 }
 
 export interface Round {
   roundNumber: number;
   matches: Match[];
   isCompleted: boolean;
+  isRealDraw?: boolean; // Whether this round was an official draw in real life
 }
 

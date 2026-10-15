@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSwissSimulation } from '../src/hooks/useSwissSimulation';
 import { Navbar, ActiveTab } from '../src/components/Navbar';
@@ -10,6 +10,8 @@ import { PlayInSelection } from '../src/components/PlayInSelection';
 import { SplashScreen } from '../src/components/SplashScreen';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { Team } from '../src/types/swiss';
+import { TimezoneSelector } from '../src/components/TimezoneSelector';
+import { TIMEZONE_OPTIONS, TimezoneOption } from '../src/types/timezone';
 
 // Lazy-load Playoffs completely so its code, draw algorithm and components
 // are NOT downloaded in the initial bundle until the user accesses Playoffs.
@@ -30,7 +32,13 @@ export default function WorldsSimulatorPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('swiss');
   const [hasChampion, setHasChampion] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
+  const [selectedTimezone, setSelectedTimezone] = useState<TimezoneOption>('ART');
+  const [isMounted, setIsMounted] = useState(false);
   const playoffsResetRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Swiss stage state
   const {
@@ -42,7 +50,9 @@ export default function WorldsSimulatorPage() {
     isRoundComplete,
     qualifiedTeams,
     eliminatedTeams,
+    swissEliminatedTeams,
     isFinished: isSwissFinished,
+    isCurrentRoundRealDraw,
     startSimulation,
     selectWinner: selectSwissWinner,
     confirmRound: confirmSwissRound,
@@ -70,6 +80,34 @@ export default function WorldsSimulatorPage() {
   const selectedCount = Object.keys(selectedWinners).length;
   const isPlayInSelected = !!selectedPlayInTeam && !isPreparing;
 
+  // Prevent React Hydration mismatch between server-rendered HTML and client VDOM
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+        <Navbar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isPlayInSelected={false}
+          currentRound={1}
+          totalMatchesInRound={0}
+          selectedCount={0}
+          isRoundComplete={false}
+          qualifiedCount={0}
+          eliminatedCount={0}
+          isFinished={false}
+          hasChampion={false}
+          onConfirmRound={() => {}}
+          onAutoPick={() => {}}
+          onResetSwiss={() => {}}
+          onResetPlayoffs={() => {}}
+        />
+        <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-5 flex items-center justify-center">
+          <SplashScreen message="Iniciando simulador..." />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
       {/* Top Navbar with Tab Navigation */}
@@ -82,7 +120,7 @@ export default function WorldsSimulatorPage() {
         selectedCount={selectedCount}
         isRoundComplete={isRoundComplete}
         qualifiedCount={qualifiedTeams.length}
-        eliminatedCount={eliminatedTeams.length}
+        eliminatedCount={swissEliminatedTeams.length}
         isFinished={isSwissFinished}
         hasChampion={hasChampion}
         onConfirmRound={confirmSwissRound}
@@ -106,6 +144,10 @@ export default function WorldsSimulatorPage() {
               {/* Rounds 1 to 5 */}
               {[1, 2, 3, 4, 5].map((roundNum) => {
                 const completedRoundData = rounds.find((r) => r.roundNumber === roundNum);
+                const isRoundRealDraw =
+                  roundNum === currentRound
+                    ? isCurrentRoundRealDraw
+                    : completedRoundData?.isRealDraw ?? false;
 
                 return (
                   <RoundColumn
@@ -117,7 +159,9 @@ export default function WorldsSimulatorPage() {
                     activeMatches={activeMatches}
                     selectedWinners={selectedWinners}
                     onSelectWinner={selectSwissWinner}
-                    onRerollRound={rerollSwissRound}
+                    onRerollRound={isRoundRealDraw ? undefined : rerollSwissRound}
+                    timeZone={TIMEZONE_OPTIONS[selectedTimezone].timeZone}
+                    isRealDraw={isRoundRealDraw}
                   />
                 );
               })}
@@ -142,6 +186,12 @@ export default function WorldsSimulatorPage() {
           )}
         </ErrorBoundary>
       </main>
+
+      {/* Floating Minimalist Timezone Selector */}
+      <TimezoneSelector
+        selectedTimezone={selectedTimezone}
+        onSelectTimezone={setSelectedTimezone}
+      />
     </div>
   );
 }

@@ -8,6 +8,8 @@ interface RecordPoolGroupProps {
   selectedWinners: Record<string, string>;
   isReadOnly?: boolean;
   onSelectWinner?: (matchId: string, winnerId: string) => void;
+  timeZone?: string;
+  nextScheduledTimeMap?: Record<string, string | undefined>;
 }
 
 export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
@@ -16,7 +18,22 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
   selectedWinners,
   isReadOnly = false,
   onSelectWinner,
+  timeZone,
+  nextScheduledTimeMap,
 }) => {
+  const sortedMatches = React.useMemo(() => {
+    const hasScheduled = matches.some((m) => !!m.scheduledTime);
+    if (!hasScheduled) return matches;
+    return [...matches].sort((a, b) => {
+      if (a.scheduledTime && b.scheduledTime) {
+        return new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime();
+      }
+      if (a.scheduledTime) return -1;
+      if (b.scheduledTime) return 1;
+      return 0;
+    });
+  }, [matches]);
+
   const [wins, losses] = poolRecord.split('-').map(Number);
   const isAdvancement = wins === 2 && losses < 2;
   const isElimination = losses === 2 && wins < 2;
@@ -54,13 +71,15 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
 
       {/* Match Cards List */}
       <div className="space-y-1.5 w-full">
-        {matches.map((match) => (
+        {sortedMatches.map((match) => (
           <MatchCard
             key={match.id}
             match={match}
             selectedWinnerId={selectedWinners[match.id]}
             isReadOnly={isReadOnly}
             onSelectWinner={onSelectWinner}
+            timeZone={timeZone}
+            nextScheduledTime={nextScheduledTimeMap ? nextScheduledTimeMap[match.id] : undefined}
           />
         ))}
       </div>

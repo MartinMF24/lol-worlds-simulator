@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { Match, Round } from '../types/swiss';
 import { RecordPoolGroup } from './RecordPoolGroup';
 import { MatchCard } from './MatchCard';
+import { formatMatchDateHeader } from '../utils/timezone';
 import { Dices } from 'lucide-react';
 
 interface RoundColumnProps {
@@ -13,6 +14,8 @@ interface RoundColumnProps {
   selectedWinners: Record<string, string>;
   onSelectWinner?: (matchId: string, winnerId: string) => void;
   onRerollRound?: () => void;
+  timeZone?: string;
+  isRealDraw?: boolean;
 }
 
 export const RoundColumn: React.FC<RoundColumnProps> = memo(({
@@ -24,6 +27,8 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
   selectedWinners,
   onSelectWinner,
   onRerollRound,
+  timeZone,
+  isRealDraw = false,
 }) => {
   const isPast = roundNumber < currentRound || (isFinished && roundNumber <= currentRound);
   const isActive = roundNumber === currentRound && !isFinished;
@@ -54,6 +59,46 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
     return { poolsMap: map, sortedPoolKeys: keys };
   }, [matches]);
 
+  // Check if all scheduled matches share the same date
+  const roundDateHeader = useMemo(() => {
+    const scheduledMatches = matches.filter((m) => !!m.scheduledTime);
+    if (scheduledMatches.length === 0) return null;
+
+    const firstDateHeader = formatMatchDateHeader(scheduledMatches[0].scheduledTime, timeZone);
+    const allSameDate = scheduledMatches.every(
+      (m) => formatMatchDateHeader(m.scheduledTime, timeZone) === firstDateHeader
+    );
+
+    return allSameDate ? firstDateHeader : null;
+  }, [matches, timeZone]);
+
+  // Calculate nextScheduledTimeMap for LIVE indicator calculation and sort matches chronologically
+  const { sortedMatches, nextScheduledTimeMap } = useMemo(() => {
+    const scheduled = [...matches]
+      .filter((m) => !!m.scheduledTime)
+      .sort((a, b) => new Date(a.scheduledTime!).getTime() - new Date(b.scheduledTime!).getTime());
+
+    const nextMap: Record<string, string | undefined> = {};
+    for (let i = 0; i < scheduled.length; i++) {
+      const nextMatch = scheduled[i + 1];
+      nextMap[scheduled[i].id] = nextMatch ? nextMatch.scheduledTime : undefined;
+    }
+
+    const hasScheduled = matches.some((m) => !!m.scheduledTime);
+    const sorted = hasScheduled
+      ? [...matches].sort((a, b) => {
+          if (a.scheduledTime && b.scheduledTime) {
+            return new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime();
+          }
+          if (a.scheduledTime) return -1;
+          if (b.scheduledTime) return 1;
+          return 0;
+        })
+      : matches;
+
+    return { sortedMatches: sorted, nextScheduledTimeMap: nextMap };
+  }, [matches]);
+
   return (
     <div
       className={`w-full min-w-0 flex flex-col rounded-xl border transition-all duration-200 ${
@@ -66,10 +111,18 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
     >
       {/* Header */}
       <div className="px-3 py-2.5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/60 rounded-t-xl">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex flex-col min-w-0 leading-tight">
           <span className="text-xs font-bold text-white truncate">
             Ronda {roundNumber}
           </span>
+          {roundDateHeader && (
+            <span
+              suppressHydrationWarning
+              className="text-[10px] text-amber-400/90 font-mono font-medium truncate mt-0.5"
+            >
+              {roundDateHeader}
+            </span>
+          )}
         </div>
 
         <div>
@@ -79,7 +132,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
             </span>
           ) : isActive ? (
             <div className="flex items-center gap-1.5 flex-shrink-0">
-              {onRerollRound && (
+              {onRerollRound && !isRealDraw && (
                 <button
                   type="button"
                   onClick={onRerollRound}
@@ -89,6 +142,11 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
                 >
                   <Dices className="w-3.5 h-3.5 text-amber-400" />
                 </button>
+              )}
+              {isRealDraw && (
+                <span className="text-[9px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700">
+                  Oficial
+                </span>
               )}
               <span className="text-[10px] font-semibold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
                 En juego
@@ -112,13 +170,15 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
           </div>
         ) : roundNumber === 1 ? (
           <div className="space-y-1.5 w-full">
-            {matches.map((match) => (
+            {sortedMatches.map((match) => (
               <MatchCard
                 key={match.id}
                 match={match}
                 selectedWinnerId={selectedWinners[match.id]}
                 isReadOnly={isPast}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
+                nextScheduledTime={nextScheduledTimeMap[match.id]}
               />
             ))}
           </div>
@@ -136,6 +196,8 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
                 selectedWinners={selectedWinners}
                 isReadOnly={isPast}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
+                nextScheduledTimeMap={nextScheduledTimeMap}
               />
             </React.Fragment>
           ))
@@ -144,12 +206,14 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
     </div>
   );
 }, (prev, next) => {
-  // If basic round identifiers or tournament states changed, re-render
+  // If basic round identifiers, timezone or tournament states changed, re-render
   if (
     prev.roundNumber !== next.roundNumber ||
     prev.currentRound !== next.currentRound ||
     prev.isFinished !== next.isFinished ||
-    prev.roundData !== next.roundData
+    prev.roundData !== next.roundData ||
+    prev.timeZone !== next.timeZone ||
+    prev.isRealDraw !== next.isRealDraw
   ) {
     return false;
   }
