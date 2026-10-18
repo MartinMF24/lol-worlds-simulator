@@ -38,13 +38,13 @@ export interface RealTournamentConfig {
 
 export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
   // Ganador oficial del Play-in. Cambiar a null para habilitar la pantalla de selección manual.
-  playInWinnerId: null,
+  playInWinnerId: 'kc',
 
   rounds: [
     {
       roundNumber: 1,
-      isRealDraw: false,
-      matches: [/*
+      isRealDraw: true,
+      matches: [
         {
           id: 'r1-m1',
           team1Id: 'gen',
@@ -54,54 +54,54 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
         },
         {
           id: 'r1-m2',
-          team1Id: 'blg',
-          team2Id: 'mkoi',
+          team1Id: 'tl',
+          team2Id: 'cfo',
           scheduledTime: '2026-10-20T15:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m3',
-          team1Id: 'g2',
-          team2Id: 'dk',
+          team1Id: 'al',
+          team2Id: 'kc',
           scheduledTime: '2026-10-20T16:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m4',
-          team1Id: 'hle',
-          team2Id: 'lyon',
+          team1Id: 'g2',
+          team2Id: 'dk',
           scheduledTime: '2026-10-20T17:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m5',
-          team1Id: 'al',
-          team2Id: 'c9',
+          team1Id: 'hle',
+          team2Id: 'tes',
           scheduledTime: '2026-10-20T18:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m6',
-          team1Id: 'tl',
-          team2Id: 'cfo',
+          team1Id: 'los',
+          team2Id: 't1',
           scheduledTime: '2026-10-20T19:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m7',
           team1Id: 'tsw',
-          team2Id: 'tes',
+          team2Id: 'lyon',
           scheduledTime: '2026-10-20T20:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r1-m8',
-          team1Id: 'cblol2',
-          team2Id: 't1',
+          team1Id: 'blg',
+          team2Id: 'koi',
           scheduledTime: '2026-10-20T21:00:00-03:00',
           winnerId: null,
         },
-      */],
+      ],
     },
     {
       roundNumber: 2,
