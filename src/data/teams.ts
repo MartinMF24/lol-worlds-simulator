@@ -254,7 +254,7 @@ export const BASE_15_TEAMS: Team[] = [
 
   // CBLOL (Brazil)
   {
-    id: 'cblol2',
+    id: 'los',
     name: 'Los Grandes',
     region: 'CBLOL',
     seed: 2,
