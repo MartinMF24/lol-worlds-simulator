@@ -103,6 +103,11 @@ export const TEAM_RATINGS: Record<string, TeamRatings> = {
     teamplay: 78,
     strategy: 77,
   },
+  los: {
+    individual: 76,
+    teamplay: 78,
+    strategy: 77,
+  },
 
   // Candidatos de Play-in (Cupo 16)
   kc: {
@@ -128,17 +133,25 @@ export const TEAM_RATINGS: Record<string, TeamRatings> = {
 };
 
 /**
+ * Obtiene los ratings individuales de un equipo dado.
+ */
+export function getTeamRatings(teamId: string): TeamRatings {
+  const normalized = teamId.toLowerCase();
+  return TEAM_RATINGS[normalized] || TEAM_RATINGS[teamId] || {
+    individual: 75,
+    teamplay: 75,
+    strategy: 75,
+  };
+}
+
+/**
  * Obtiene el rating compuesto ponderado (escala 1 a 100) para un equipo dado.
  */
 export function getTeamOverallRating(
   teamId: string,
   weights: RatingWeights = DEFAULT_RATING_WEIGHTS
 ): number {
-  const ratings = TEAM_RATINGS[teamId] || {
-    individual: 75,
-    teamplay: 75,
-    strategy: 75,
-  };
+  const ratings = getTeamRatings(teamId);
 
   return (
     ratings.teamplay * weights.teamplay +

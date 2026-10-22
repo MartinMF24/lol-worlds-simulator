@@ -45,8 +45,8 @@ export const TeamRosterTooltip: React.FC<TeamRosterTooltipProps> = memo(({
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    const tooltipWidth = 210;
-    const tooltipHeight = 185;
+    const tooltipWidth = 240;
+    const tooltipHeight = 205;
     const padding = 10;
 
     let left: number;
@@ -87,11 +87,11 @@ export const TeamRosterTooltip: React.FC<TeamRosterTooltipProps> = memo(({
   const handleMouseEnter = () => {
     if (!team.roster) return;
     clearTimer();
-    // Delay 1 second (1000ms) before opening
+    // Delay 0.5 seconds (500ms) before opening
     timerRef.current = setTimeout(() => {
       updatePosition();
       setIsOpen(true);
-    }, 1000);
+    }, 500);
   };
 
   const handleMouseLeave = () => {
@@ -135,4 +135,3 @@ export const TeamRosterTooltip: React.FC<TeamRosterTooltipProps> = memo(({
 });
 
 TeamRosterTooltip.displayName = 'TeamRosterTooltip';
-
