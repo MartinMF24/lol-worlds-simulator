@@ -3,6 +3,8 @@ import { Team, Match, Round } from '../types/swiss';
 import { createInitialTeams, PLAY_IN_CANDIDATES } from '../data/teams';
 import { drawSwissRound } from '../utils/swissDraw';
 import { REAL_TOURNAMENT_DATA, RealTournamentConfig, RealMatchData } from '../data/tournamentData';
+import { predictMatchesBatch } from '../utils/monteCarlo';
+import { MatchProbability } from '../types/ratings';
 
 export interface UseSwissSimulationReturn {
   teams: Team[];
@@ -11,6 +13,7 @@ export interface UseSwissSimulationReturn {
   rounds: Round[];
   activeMatches: Match[];
   selectedWinners: Record<string, string>;
+  matchProbabilities: Record<string, MatchProbability>;
   isRoundComplete: boolean;
   qualifiedTeams: Team[];
   eliminatedTeams: Team[];
@@ -23,6 +26,7 @@ export interface UseSwissSimulationReturn {
   rerollRound: () => void;
   resetSimulation: () => void;
   autoPickWinners: () => void;
+  autoPickWinnersByProbability: () => void;
 }
 
 export interface InitialTournamentState {
@@ -258,6 +262,12 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     return activeMatches.every((m) => !!selectedWinners[m.id]);
   }, [activeMatches, selectedWinners]);
 
+  // Probabilidades de Monte Carlo (N=1000 con semilla determinista) calculadas para los partidos de la ronda activa
+  const matchProbabilities = useMemo(() => {
+    if (activeMatches.length === 0) return {};
+    return predictMatchesBatch(activeMatches, 1000);
+  }, [activeMatches]);
+
   // Start simulation with chosen Play-in winner (when manual selection is enabled)
   const startSimulation = useCallback((playInTeam: Team) => {
     const state = computeInitialTournamentState(playInTeam);
@@ -297,7 +307,7 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     });
   }, []);
 
-  // Quick helper to randomly pick winners for unpicked matches in current round
+  // Opción 1: Auto-Pick aleatorio clásico (50/50)
   const autoPickWinners = useCallback(() => {
     if (activeMatches.length === 0) return;
     const newWinners: Record<string, string> = { ...selectedWinners };
@@ -308,6 +318,23 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     });
     setSelectedWinners(newWinners);
   }, [activeMatches, selectedWinners]);
+
+  // Opción 2: Auto-Pick por mayor probabilidad (favorito de Monte Carlo)
+  const autoPickWinnersByProbability = useCallback(() => {
+    if (activeMatches.length === 0) return;
+    const newWinners: Record<string, string> = { ...selectedWinners };
+    activeMatches.forEach((m) => {
+      if (!newWinners[m.id]) {
+        const prob = matchProbabilities[m.id];
+        if (prob) {
+          newWinners[m.id] = prob.team1Prob >= prob.team2Prob ? m.team1.id : m.team2.id;
+        } else {
+          newWinners[m.id] = m.team1.id;
+        }
+      }
+    });
+    setSelectedWinners(newWinners);
+  }, [activeMatches, selectedWinners, matchProbabilities]);
 
   // Confirm current round and progress to next round or finish
   const confirmRound = useCallback(() => {
@@ -455,6 +482,7 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     rounds,
     activeMatches,
     selectedWinners,
+    matchProbabilities,
     isRoundComplete,
     qualifiedTeams,
     eliminatedTeams,
@@ -467,5 +495,6 @@ export function useSwissSimulation(): UseSwissSimulationReturn {
     rerollRound,
     resetSimulation,
     autoPickWinners,
+    autoPickWinnersByProbability,
   };
 }

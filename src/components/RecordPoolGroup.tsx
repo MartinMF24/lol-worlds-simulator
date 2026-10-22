@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Match } from '../types/swiss';
+import { MatchProbability } from '../types/ratings';
 import { MatchCard } from './MatchCard';
 
 interface RecordPoolGroupProps {
@@ -10,6 +11,7 @@ interface RecordPoolGroupProps {
   onSelectWinner?: (matchId: string, winnerId: string) => void;
   timeZone?: string;
   nextScheduledTimeMap?: Record<string, string | undefined>;
+  probabilitiesMap?: Record<string, MatchProbability>;
 }
 
 export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
@@ -20,6 +22,7 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
   onSelectWinner,
   timeZone,
   nextScheduledTimeMap,
+  probabilitiesMap,
 }) => {
   const sortedMatches = React.useMemo(() => {
     const hasScheduled = matches.some((m) => !!m.scheduledTime);
@@ -80,6 +83,7 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
             onSelectWinner={onSelectWinner}
             timeZone={timeZone}
             nextScheduledTime={nextScheduledTimeMap ? nextScheduledTimeMap[match.id] : undefined}
+            probability={probabilitiesMap?.[match.id]}
           />
         ))}
       </div>
@@ -88,4 +92,3 @@ export const RecordPoolGroup: React.FC<RecordPoolGroupProps> = memo(({
 });
 
 RecordPoolGroup.displayName = 'RecordPoolGroup';
-

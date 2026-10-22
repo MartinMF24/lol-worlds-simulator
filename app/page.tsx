@@ -47,6 +47,7 @@ export default function WorldsSimulatorPage() {
     rounds,
     activeMatches,
     selectedWinners,
+    matchProbabilities,
     isRoundComplete,
     qualifiedTeams,
     eliminatedTeams,
@@ -59,6 +60,7 @@ export default function WorldsSimulatorPage() {
     rerollRound: rerollSwissRound,
     resetSimulation: resetSwissSimulation,
     autoPickWinners: autoPickSwissWinners,
+    autoPickWinnersByProbability,
   } = useSwissSimulation();
 
   const handleSelectPlayIn = (team: Team) => {
@@ -127,6 +129,7 @@ export default function WorldsSimulatorPage() {
         onAutoPick={autoPickSwissWinners}
         onResetSwiss={handleResetTournament}
         onResetPlayoffs={() => playoffsResetRef.current?.()}
+        onAutoPickByProbability={autoPickWinnersByProbability}
       />
 
       {/* Main View Area */}
@@ -162,6 +165,7 @@ export default function WorldsSimulatorPage() {
                     onRerollRound={isRoundRealDraw ? undefined : rerollSwissRound}
                     timeZone={TIMEZONE_OPTIONS[selectedTimezone].timeZone}
                     isRealDraw={isRoundRealDraw}
+                    probabilitiesMap={roundNum === currentRound ? matchProbabilities : undefined}
                   />
                 );
               })}

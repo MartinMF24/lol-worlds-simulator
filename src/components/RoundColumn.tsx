@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { Match, Round } from '../types/swiss';
+import { MatchProbability } from '../types/ratings';
 import { RecordPoolGroup } from './RecordPoolGroup';
 import { MatchCard } from './MatchCard';
 import { formatMatchDateHeader } from '../utils/timezone';
@@ -16,6 +17,7 @@ interface RoundColumnProps {
   onRerollRound?: () => void;
   timeZone?: string;
   isRealDraw?: boolean;
+  probabilitiesMap?: Record<string, MatchProbability>;
 }
 
 export const RoundColumn: React.FC<RoundColumnProps> = memo(({
@@ -29,6 +31,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
   onRerollRound,
   timeZone,
   isRealDraw = false,
+  probabilitiesMap,
 }) => {
   const isPast = roundNumber < currentRound || (isFinished && roundNumber <= currentRound);
   const isActive = roundNumber === currentRound && !isFinished;
@@ -106,7 +109,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
           ? 'bg-zinc-900/70 border-zinc-650 ring-1 ring-zinc-500/30 shadow-sm'
           : isPast
           ? 'bg-zinc-950/60 border-zinc-800 opacity-85 hover:opacity-100'
-          : 'bg-zinc-950/20 border-dashed border-zinc-850/60 opacity-40'
+          : 'bg-zinc-950/20 border-dashed border-zinc-855/60 opacity-40'
       }`}
     >
       {/* Header */}
@@ -179,6 +182,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
                 onSelectWinner={onSelectWinner}
                 timeZone={timeZone}
                 nextScheduledTime={nextScheduledTimeMap[match.id]}
+                probability={probabilitiesMap?.[match.id]}
               />
             ))}
           </div>
@@ -198,6 +202,7 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
                 onSelectWinner={onSelectWinner}
                 timeZone={timeZone}
                 nextScheduledTimeMap={nextScheduledTimeMap}
+                probabilitiesMap={probabilitiesMap}
               />
             </React.Fragment>
           ))
@@ -218,14 +223,15 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
     return false;
   }
 
-  // If this column is the active round, re-render only if active matches or winners changed
+  // If this column is the active round, re-render only if active matches, winners or probabilities changed
   const isActive = next.roundNumber === next.currentRound && !next.isFinished;
   if (isActive) {
     return (
       prev.activeMatches === next.activeMatches &&
       prev.selectedWinners === next.selectedWinners &&
       prev.onSelectWinner === next.onSelectWinner &&
-      prev.onRerollRound === next.onRerollRound
+      prev.onRerollRound === next.onRerollRound &&
+      prev.probabilitiesMap === next.probabilitiesMap
     );
   }
 
@@ -234,4 +240,3 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
 });
 
 RoundColumn.displayName = 'RoundColumn';
-

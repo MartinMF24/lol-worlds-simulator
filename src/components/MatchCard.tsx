@@ -5,6 +5,7 @@ import { getTeamImage } from '../data/teamImages';
 import { TeamRosterTooltip } from './TeamRosterTooltip';
 import { sanitizeString } from '../utils/security';
 import { formatMatchTime } from '../utils/timezone';
+import { MatchProbability } from '../types/ratings';
 import { Check, Clock } from 'lucide-react';
 
 interface MatchCardProps {
@@ -14,6 +15,7 @@ interface MatchCardProps {
   onSelectWinner?: (matchId: string, winnerId: string) => void;
   timeZone?: string;
   nextScheduledTime?: string;
+  probability?: MatchProbability;
 }
 
 export const MatchCard: React.FC<MatchCardProps> = memo(({
@@ -23,6 +25,7 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
   onSelectWinner,
   timeZone = 'America/Argentina/Buenos_Aires',
   nextScheduledTime,
+  probability,
 }) => {
   const effectiveWinnerId = isReadOnly ? match.winnerId : selectedWinnerId;
 
@@ -75,7 +78,7 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
           type="button"
           disabled={isReadOnly}
           onClick={() => onSelectWinner && onSelectWinner(match.id, team.id)}
-          className={`w-full h-8 flex items-center justify-between px-2 rounded text-left transition-colors duration-150 border ${
+          className={`w-full h-7 sm:h-[30px] flex items-center justify-between px-2 rounded text-left transition-colors duration-150 border ${
             isReadOnly
               ? isWinner
                 ? 'bg-zinc-800 text-white font-medium border-zinc-650'
@@ -163,7 +166,7 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
   return (
     <div className="bg-zinc-900 rounded-lg border border-zinc-750 p-1 hover:border-zinc-650 transition-colors duration-150 w-full">
       {hasHeaderContent && (
-        <div className="px-1.5 pt-0.5 pb-1 flex items-center justify-between border-b border-zinc-800 mb-0.5 min-h-[22px]">
+        <div className="px-1.5 pt-0.5 pb-0.5 flex items-center justify-between border-b border-zinc-800 mb-0.5 min-h-[20px]">
           {/* Left: Pool Record or Bo1 & Stakes */}
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-mono font-medium">
@@ -187,10 +190,46 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
         </div>
       )}
 
+      {/* Teams List */}
       <div className="space-y-0.5">
         {renderTeamRow(match.team1)}
         {renderTeamRow(match.team2)}
       </div>
+
+      {/* Monte Carlo Visual Probability Widget (Compact Single-Row Layout) */}
+      {probability && (
+        <div className="mt-1 pt-1 border-t border-zinc-800/70 px-1 flex items-center gap-1.5">
+          {/* Team 1 % (Equipo de arriba - Amarillo) */}
+          <span
+            className="font-mono font-bold text-amber-400 text-[11px] leading-none flex-shrink-0"
+            title={`${sanitizeString(match.team1.name)}: ${probability.team1Prob}%`}
+          >
+            {probability.team1Prob}%
+          </span>
+
+          {/* Segmented Bar: Amarillo (Izq) & Gris (Der) */}
+          <div className="flex-1 h-1.5 flex gap-1 rounded-sm overflow-hidden bg-zinc-950">
+            <div
+              className="h-full bg-amber-400 rounded-sm transition-all duration-300 min-w-[4px]"
+              style={{ width: `${probability.team1Prob}%` }}
+              title={`${sanitizeString(match.team1.name)}: ${probability.team1Prob}%`}
+            />
+            <div
+              className="h-full bg-zinc-400 rounded-sm transition-all duration-300 min-w-[4px]"
+              style={{ width: `${probability.team2Prob}%` }}
+              title={`${sanitizeString(match.team2.name)}: ${probability.team2Prob}%`}
+            />
+          </div>
+
+          {/* Team 2 % (Equipo de abajo - Gris) */}
+          <span
+            className="font-mono font-bold text-zinc-400 text-[11px] leading-none flex-shrink-0"
+            title={`${sanitizeString(match.team2.name)}: ${probability.team2Prob}%`}
+          >
+            {probability.team2Prob}%
+          </span>
+        </div>
+      )}
     </div>
   );
 });

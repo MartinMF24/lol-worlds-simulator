@@ -1,5 +1,5 @@
-import React from 'react';
-import { RotateCcw, Trophy, Info } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { RotateCcw, Trophy, Info, Sparkles, Dices, ChevronDown } from 'lucide-react';
 
 export type ActiveTab = 'swiss' | 'playoffs';
 
@@ -19,6 +19,7 @@ interface NavbarProps {
   onAutoPick: () => void;
   onResetSwiss: () => void;
   onResetPlayoffs: () => void;
+  onAutoPickByProbability?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,7 +38,27 @@ export const Navbar: React.FC<NavbarProps> = ({
   onAutoPick,
   onResetSwiss,
   onResetPlayoffs,
+  onAutoPickByProbability,
 }) => {
+  const [isAutoPickMenuOpen, setIsAutoPickMenuOpen] = useState(false);
+  const autoPickRef = useRef<HTMLDivElement>(null);
+
+  // Close auto-pick dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (autoPickRef.current && !autoPickRef.current.contains(event.target as Node)) {
+        setIsAutoPickMenuOpen(false);
+      }
+    };
+
+    if (isAutoPickMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAutoPickMenuOpen]);
+
   return (
     <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-6 h-14 flex items-center">
       <div className="w-full flex items-center justify-between gap-4">
@@ -149,14 +170,67 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <>
                   {!isFinished ? (
                     <>
-                      {/* Auto-completar */}
-                      <button
-                        type="button"
-                        onClick={onAutoPick}
-                        className="text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 bg-zinc-900 border border-zinc-750 px-3 py-1.5 rounded-md transition-colors duration-150 font-medium"
-                      >
-                        Auto-completar
-                      </button>
+                      {/* Auto-Pick Split Button (Aleatorio / Probabilidad) */}
+                      <div className="relative" ref={autoPickRef}>
+                        <div className="flex items-center rounded-md border border-zinc-750 bg-zinc-900">
+                          <button
+                            type="button"
+                            onClick={onAutoPick}
+                            className="text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 px-2.5 py-1.5 rounded-l-md transition-colors duration-150 font-medium cursor-pointer"
+                            title="Auto-completar aleatorio (50/50)"
+                          >
+                            Auto-pick
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsAutoPickMenuOpen((v) => !v)}
+                            className="px-1.5 py-1.5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border-l border-zinc-750 rounded-r-md transition-colors duration-150 cursor-pointer"
+                            title="Opciones de Auto-pick"
+                            aria-label="Opciones de Auto-pick"
+                          >
+                            <ChevronDown
+                              className={`w-3 h-3 transition-transform duration-150 ${
+                                isAutoPickMenuOpen ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {isAutoPickMenuOpen && (
+                          <div className="absolute right-0 top-full mt-1.5 w-52 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-zinc-750 shadow-xl py-1 z-50">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onAutoPick();
+                                setIsAutoPickMenuOpen(false);
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 flex items-center gap-2.5 transition-colors duration-150 cursor-pointer"
+                            >
+                              <Dices className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-medium text-zinc-200">Aleatorio</span>
+                                <span className="text-[10px] text-zinc-500">50% / 50% al azar</span>
+                              </div>
+                            </button>
+                            {onAutoPickByProbability && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onAutoPickByProbability();
+                                  setIsAutoPickMenuOpen(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 flex items-center gap-2.5 border-t border-zinc-800 transition-colors duration-150 cursor-pointer"
+                              >
+                                <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                                <div className="flex flex-col min-w-0">
+                                  <span className="font-medium text-amber-300">Por Probabilidad</span>
+                                  <span className="text-[10px] text-zinc-500">Favorito de Monte Carlo</span>
+                                </div>
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
 
                       {/* Confirm Round Button */}
                       <button
