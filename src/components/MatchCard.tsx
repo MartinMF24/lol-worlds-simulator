@@ -67,6 +67,8 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
     return () => clearInterval(timer);
   }, [match.scheduledTime, nextScheduledTime, effectiveWinnerId]);
 
+  const isOfficial = !!match.isOfficialWinner;
+
   const renderTeamRow = (team: Team) => {
     const isWinner = effectiveWinnerId === team.id;
     const isLoser = effectiveWinnerId !== null && effectiveWinnerId !== undefined && !isWinner;
@@ -76,17 +78,25 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
       <TeamRosterTooltip team={team}>
         <button
           type="button"
-          disabled={isReadOnly}
+          disabled={isReadOnly || isOfficial}
           onClick={() => onSelectWinner && onSelectWinner(match.id, team.id)}
           className={`w-full h-7 sm:h-[30px] flex items-center justify-between px-2 rounded text-left transition-colors duration-150 border ${
             isReadOnly
               ? isWinner
-                ? 'bg-zinc-800 text-white font-medium border-zinc-650'
+                ? isOfficial
+                  ? 'bg-emerald-500/10 text-white font-medium border-emerald-500/30 cursor-default'
+                  : 'bg-zinc-800 text-white font-medium border-zinc-650'
                 : 'opacity-50 text-zinc-400 border-transparent'
-              : isSelectedInActive
-              ? 'bg-amber-400/15 text-white font-medium border-amber-400 shadow-sm'
+              : isWinner
+              ? isOfficial
+                ? 'bg-emerald-500/15 text-white font-medium border-emerald-500/40 shadow-sm cursor-default'
+                : 'bg-amber-400/15 text-white font-medium border-amber-400 shadow-sm'
               : isLoser
-              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              ? isOfficial
+                ? 'opacity-40 text-zinc-400 border-transparent cursor-default'
+                : 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              : isOfficial
+              ? 'text-zinc-200 border-transparent cursor-default'
               : 'text-zinc-200 hover:bg-zinc-800/70 border-transparent'
           }`}
         >
@@ -122,11 +132,20 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
             <span
               className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 transition-opacity duration-150 ${
                 isWinner
-                  ? isReadOnly
+                  ? isOfficial
+                    ? 'text-emerald-400 bg-emerald-500/20 opacity-100 ring-1 ring-emerald-500/40'
+                    : isReadOnly
                     ? 'text-zinc-200 bg-zinc-700 opacity-100'
                     : 'text-amber-400 bg-amber-400/20 opacity-100'
                   : 'opacity-0 pointer-events-none'
               }`}
+              title={
+                isWinner
+                  ? isOfficial
+                    ? 'Ganador oficial definido en el torneo real'
+                    : 'Ganador seleccionado por simulación'
+                  : undefined
+              }
             >
               <Check className="w-2.5 h-2.5 stroke-[3]" />
             </span>
@@ -167,11 +186,16 @@ export const MatchCard: React.FC<MatchCardProps> = memo(({
     <div className="bg-zinc-900 rounded-lg border border-zinc-750 p-1 hover:border-zinc-650 transition-colors duration-150 w-full">
       {hasHeaderContent && (
         <div className="px-1.5 pt-0.5 pb-0.5 flex items-center justify-between border-b border-zinc-800 mb-0.5 min-h-[20px]">
-          {/* Left: Pool Record or Bo1 & Stakes */}
+          {/* Left: Pool Record or Bo1, Stakes & Official Badge */}
           <div className="flex items-center gap-1.5 min-w-0">
             <span className="text-[9px] uppercase tracking-wider text-zinc-400 font-mono font-medium">
               {match.poolRecord === '0-0' ? 'Bo1' : match.poolRecord}
             </span>
+            {isOfficial && (
+              <span className="text-[9px] font-mono font-semibold text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/25 leading-none">
+                Oficial
+              </span>
+            )}
             {stakesLabel}
           </div>
 
