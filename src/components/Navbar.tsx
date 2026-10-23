@@ -152,13 +152,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Info className="w-3.5 h-3.5" />
             </button>
 
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-zinc-750 shadow-xl text-zinc-300 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 p-3 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-zinc-750 shadow-xl text-zinc-300 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
               <div className="flex items-center gap-1.5 font-semibold text-zinc-100 mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <span>Version 1.0</span>
+                <span>Versión 2.0</span>
               </div>
               <p className="text-[11px] leading-relaxed text-zinc-400">
-                Este simulador del mundial de League of Legends. Se irá actualizando en tiempo real conforme se disputen las rondas.
+                Actualizado con el sorteo oficial y horarios reales de la Ronda 1. Se incorporó el cuadro de Playoffs, ratings competitivos para cada equipo y cálculo de probabilidades de victoria con simulación de Monte Carlo. Se irá actualizando en tiempo real conforme avance el torneo.
               </p>
             </div>
           </div>
