@@ -85,6 +85,10 @@ export const TeamRosterTooltip: React.FC<TeamRosterTooltipProps> = memo(({
   }, []);
 
   const handleMouseEnter = () => {
+    // Only trigger hover on devices that support hover (prevents popup from sticking on mobile taps)
+    if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
+      return;
+    }
     if (!team.roster) return;
     clearTimer();
     // Delay 0.5 seconds (500ms) before opening

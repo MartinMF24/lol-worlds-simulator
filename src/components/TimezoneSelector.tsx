@@ -43,10 +43,10 @@ export const TimezoneSelector: React.FC<TimezoneSelectorProps> = memo(({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className="fixed bottom-4 right-4 z-40 select-none">
+    <div ref={containerRef} className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 select-none">
       {/* Dropdown Menu (Opens Upward) */}
       {isOpen && (
-        <div className="absolute bottom-full mb-2 right-0 w-56 rounded-lg bg-zinc-900/98 backdrop-blur-md border border-zinc-750 shadow-2xl p-1.5 text-xs animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute bottom-full mb-2 right-0 w-52 sm:w-56 rounded-lg bg-zinc-900/98 backdrop-blur-md border border-zinc-750 shadow-2xl p-1.5 text-xs animate-in fade-in zoom-in-95 duration-150">
           <div className="px-2 py-1 text-[10px] uppercase font-mono tracking-wider text-zinc-500 border-b border-zinc-800/80 mb-1">
             Zona Horaria
           </div>
@@ -94,7 +94,7 @@ export const TimezoneSelector: React.FC<TimezoneSelectorProps> = memo(({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 backdrop-blur-md border border-zinc-750 hover:border-zinc-650 text-zinc-200 text-xs font-mono shadow-lg transition-all focus:outline-none focus:ring-1 focus:ring-amber-400/50 cursor-pointer"
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 backdrop-blur-md border border-zinc-750 hover:border-zinc-650 text-zinc-200 text-xs font-mono shadow-lg transition-all focus:outline-none focus:ring-1 focus:ring-amber-400/50 cursor-pointer"
         title="Cambiar zona horaria de los partidos"
         aria-label="Selector de zona horaria"
       >
@@ -103,7 +103,7 @@ export const TimezoneSelector: React.FC<TimezoneSelectorProps> = memo(({
         <span className="font-medium text-[11px] text-zinc-300">
           {currentConfig.id}
         </span>
-        <span className="text-[10px] text-zinc-500">
+        <span className="hidden sm:inline text-[10px] text-zinc-500">
           ({currentConfig.offsetLabel})
         </span>
         <ChevronUp

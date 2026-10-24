@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useSwissSimulation } from '../src/hooks/useSwissSimulation';
 import { Navbar, ActiveTab } from '../src/components/Navbar';
@@ -79,6 +79,21 @@ export default function WorldsSimulatorPage() {
     resetSwissSimulation();
   };
 
+  const scrollToColumn = useCallback((elementId: string) => {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, []);
+
+  // Auto-scroll mobile view to current round when round advances
+  useEffect(() => {
+    if (isMounted && activeTab === 'swiss' && selectedPlayInTeam) {
+      const targetId = isSwissFinished ? 'swiss-final-zone' : `swiss-round-${currentRound}`;
+      scrollToColumn(targetId);
+    }
+  }, [currentRound, isSwissFinished, activeTab, selectedPlayInTeam, isMounted, scrollToColumn]);
+
   const selectedCount = Object.keys(selectedWinners).length;
   const isPlayInSelected = !!selectedPlayInTeam && !isPreparing;
 
@@ -103,7 +118,7 @@ export default function WorldsSimulatorPage() {
           onResetSwiss={() => {}}
           onResetPlayoffs={() => {}}
         />
-        <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-5 flex items-center justify-center">
+        <main className="flex-1 w-full max-w-[1920px] mx-auto p-2.5 sm:p-4 lg:p-5 flex items-center justify-center">
           <SplashScreen message="Iniciando simulador..." />
         </main>
       </div>
@@ -133,7 +148,7 @@ export default function WorldsSimulatorPage() {
       />
 
       {/* Main View Area */}
-      <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-5 overflow-x-auto flex flex-col">
+      <main className="flex-1 w-full max-w-[1920px] mx-auto p-2.5 sm:p-4 lg:p-5 overflow-x-auto flex flex-col">
         <ErrorBoundary onReset={handleResetTournament}>
           {isPreparing ? (
             /* Splash screen while preparing Round 1 draw */
@@ -143,38 +158,76 @@ export default function WorldsSimulatorPage() {
             <PlayInSelection onSelectTeam={handleSelectPlayIn} />
           ) : activeTab === 'swiss' ? (
             /* Step 2: Swiss Stage 6 Adaptable Columns */
-            <div className="grid grid-cols-6 gap-2.5 lg:gap-3 xl:gap-3.5 w-full min-w-[1020px]">
-              {/* Rounds 1 to 5 */}
-              {[1, 2, 3, 4, 5].map((roundNum) => {
-                const completedRoundData = rounds.find((r) => r.roundNumber === roundNum);
-                const isRoundRealDraw =
-                  roundNum === currentRound
-                    ? isCurrentRoundRealDraw
-                    : completedRoundData?.isRealDraw ?? false;
+            <div className="flex flex-col w-full">
+              {/* Mobile Quick-Jump Round Navigation */}
+              <div className="flex md:hidden items-center gap-1.5 overflow-x-auto pb-2 mb-2 select-none">
+                {[1, 2, 3, 4, 5].map((roundNum) => {
+                  const isCurrent = roundNum === currentRound && !isSwissFinished;
+                  const isPast = roundNum < currentRound || isSwissFinished;
+                  return (
+                    <button
+                      key={roundNum}
+                      type="button"
+                      onClick={() => scrollToColumn(`swiss-round-${roundNum}`)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                        isCurrent
+                          ? 'bg-amber-400 text-zinc-950 shadow-sm'
+                          : isPast
+                          ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-750'
+                          : 'bg-zinc-900/60 text-zinc-500 border border-zinc-800/80 hover:text-zinc-400'
+                      }`}
+                    >
+                      Ronda {roundNum}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => scrollToColumn('swiss-final-zone')}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                    isSwissFinished
+                      ? 'bg-amber-400 text-zinc-950 shadow-sm'
+                      : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-750'
+                  }`}
+                >
+                  Finales
+                </button>
+              </div>
 
-                return (
-                  <RoundColumn
-                    key={roundNum}
-                    roundNumber={roundNum}
-                    currentRound={currentRound}
-                    isFinished={isSwissFinished}
-                    roundData={completedRoundData}
-                    activeMatches={activeMatches}
-                    selectedWinners={selectedWinners}
-                    onSelectWinner={selectSwissWinner}
-                    onRerollRound={isRoundRealDraw ? undefined : rerollSwissRound}
-                    timeZone={TIMEZONE_OPTIONS[selectedTimezone].timeZone}
-                    isRealDraw={isRoundRealDraw}
-                    probabilitiesMap={roundNum === currentRound ? matchProbabilities : undefined}
-                  />
-                );
-              })}
+              {/* Columns Container: Snap-scrollable carousel on mobile, 6-col grid on desktop */}
+              <div className="flex md:grid md:grid-cols-6 gap-3 lg:gap-3 xl:gap-3.5 w-full md:min-w-[1020px] overflow-x-auto snap-x snap-mandatory pb-2 md:pb-0">
+                {/* Rounds 1 to 5 */}
+                {[1, 2, 3, 4, 5].map((roundNum) => {
+                  const completedRoundData = rounds.find((r) => r.roundNumber === roundNum);
+                  const isRoundRealDraw =
+                    roundNum === currentRound
+                      ? isCurrentRoundRealDraw
+                      : completedRoundData?.isRealDraw ?? false;
 
-              {/* Column 6: Clasificados (Top) & Eliminados (Underneath) */}
-              <FinalZoneColumn
-                qualifiedTeams={qualifiedTeams}
-                eliminatedTeams={eliminatedTeams}
-              />
+                  return (
+                    <RoundColumn
+                      key={roundNum}
+                      roundNumber={roundNum}
+                      currentRound={currentRound}
+                      isFinished={isSwissFinished}
+                      roundData={completedRoundData}
+                      activeMatches={activeMatches}
+                      selectedWinners={selectedWinners}
+                      onSelectWinner={selectSwissWinner}
+                      onRerollRound={isRoundRealDraw ? undefined : rerollSwissRound}
+                      timeZone={TIMEZONE_OPTIONS[selectedTimezone].timeZone}
+                      isRealDraw={isRoundRealDraw}
+                      probabilitiesMap={roundNum === currentRound ? matchProbabilities : undefined}
+                    />
+                  );
+                })}
+
+                {/* Column 6: Clasificados (Top) & Eliminados (Underneath) */}
+                <FinalZoneColumn
+                  qualifiedTeams={qualifiedTeams}
+                  eliminatedTeams={eliminatedTeams}
+                />
+              </div>
             </div>
           ) : (
             /* Step 3: Playoffs Stage Dynamically Loaded */

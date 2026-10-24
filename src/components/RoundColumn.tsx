@@ -104,7 +104,8 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
 
   return (
     <div
-      className={`w-full min-w-0 flex flex-col rounded-xl border transition-all duration-200 ${
+      id={`swiss-round-${roundNumber}`}
+      className={`w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col rounded-xl border transition-all duration-200 ${
         isActive
           ? 'bg-zinc-900/70 border-zinc-650 ring-1 ring-zinc-500/30 shadow-sm'
           : isPast

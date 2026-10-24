@@ -100,7 +100,10 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = memo(({
   };
 
   return (
-    <div className="w-full min-w-0 flex flex-col gap-3">
+    <div
+      id="swiss-final-zone"
+      className="w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col gap-3"
+    >
       {/* 1. Clasificados a Playoffs (Top) */}
       <div className="flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/50">
         <div className="px-3 py-2 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/70 rounded-t-xl">
@@ -165,4 +168,3 @@ export const FinalZoneColumn: React.FC<FinalZoneColumnProps> = memo(({
 });
 
 FinalZoneColumn.displayName = 'FinalZoneColumn';
-

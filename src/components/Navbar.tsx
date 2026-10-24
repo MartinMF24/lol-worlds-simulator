@@ -60,12 +60,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [isAutoPickMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-6 h-14 flex items-center">
-      <div className="w-full flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur border-b border-zinc-800 px-3 sm:px-6 h-14 flex items-center">
+      <div className="w-full flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Title & Stage Tabs */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold tracking-tight text-white">
+            <span className="text-sm font-bold tracking-tight text-white hidden sm:inline">
               Worlds 2026
             </span>
           </div>
@@ -75,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => onTabChange('swiss')}
-              className={`px-3 py-1 rounded-md text-xs transition-colors duration-150 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md text-xs transition-colors duration-150 ${
                 activeTab === 'swiss'
                   ? 'bg-zinc-800 text-white font-medium shadow-sm'
                   : 'text-zinc-400 hover:text-zinc-200'
@@ -88,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               disabled={!isPlayInSelected}
               onClick={() => onTabChange('playoffs')}
-              className={`px-3 py-1 rounded-md text-xs transition-colors duration-150 flex items-center gap-1.5 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md text-xs transition-colors duration-150 flex items-center gap-1.5 ${
                 !isPlayInSelected
                   ? 'text-zinc-600 cursor-not-allowed opacity-50'
                   : activeTab === 'playoffs'
@@ -104,8 +104,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: Stage Context Info */}
-        <div className="flex items-center gap-2.5 text-xs font-medium">
+        {/* Center: Stage Context Info (Hidden on screens < lg to preserve mobile space) */}
+        <div className="hidden lg:flex items-center gap-2.5 text-xs font-medium">
           {!isPlayInSelected ? (
             <div className="flex items-center gap-2 text-zinc-300">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -140,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Info Tooltip (Always accessible) */}
           <div className="relative group flex items-center">
             <button
@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Info className="w-3.5 h-3.5" />
             </button>
 
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 p-3 rounded-lg bg-zinc-900/95 backdrop-blur-md border border-zinc-750 shadow-xl text-zinc-300 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+            <div className="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 sm:w-80 p-3 rounded-lg bg-zinc-900/98 backdrop-blur-md border border-zinc-750 shadow-xl text-zinc-300 text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto z-50 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
               <div className="flex items-center gap-1.5 font-semibold text-zinc-100 mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 <span>Versión 2.0</span>
@@ -176,10 +176,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             type="button"
                             onClick={onAutoPick}
-                            className="text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 px-2.5 py-1.5 rounded-l-md transition-colors duration-150 font-medium cursor-pointer"
+                            className="text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 px-2 sm:px-2.5 py-1.5 rounded-l-md transition-colors duration-150 font-medium cursor-pointer"
                             title="Auto-completar aleatorio (50/50)"
                           >
-                            Auto-pick
+                            <span className="hidden sm:inline">Auto-pick</span>
+                            <span className="sm:hidden text-[11px]">Auto</span>
                           </button>
                           <button
                             type="button"
@@ -237,24 +238,32 @@ export const Navbar: React.FC<NavbarProps> = ({
                         type="button"
                         onClick={onConfirmRound}
                         disabled={!isRoundComplete}
-                        className={`text-xs font-semibold px-4 py-1.5 rounded-md transition-colors duration-150 ${
+                        className={`text-xs font-semibold px-2.5 sm:px-4 py-1.5 rounded-md transition-colors duration-150 ${
                           isRoundComplete
                             ? 'bg-white hover:bg-zinc-100 text-zinc-950 cursor-pointer shadow-sm'
                             : 'bg-zinc-900 text-zinc-500 border border-zinc-800 cursor-not-allowed'
                         }`}
                       >
-                        {isRoundComplete
-                          ? currentRound === 5
-                            ? 'Finalizar Suizo'
-                            : `Confirmar Ronda ${currentRound}`
-                          : `Definir (${selectedCount}/${totalMatchesInRound})`}
+                        {isRoundComplete ? (
+                          currentRound === 5 ? (
+                            'Finalizar'
+                          ) : (
+                            <>
+                              <span className="hidden sm:inline">Confirmar </span>R{currentRound}
+                            </>
+                          )
+                        ) : (
+                          <>
+                            <span className="hidden sm:inline">Definir </span>({selectedCount}/{totalMatchesInRound})
+                          </>
+                        )}
                       </button>
                     </>
                   ) : (
                     <button
                       type="button"
                       onClick={() => onTabChange('playoffs')}
-                      className="text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-black px-3.5 py-1.5 rounded-md transition-colors duration-150 shadow-sm"
+                      className="text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-black px-3 sm:px-3.5 py-1.5 rounded-md transition-colors duration-150 shadow-sm"
                     >
                       Ir a Playoffs →
                     </button>
@@ -276,11 +285,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={onResetPlayoffs}
-                    className="flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 bg-zinc-900 border border-zinc-750 px-3 py-1.5 rounded-md transition-colors duration-150 font-medium"
+                    className="flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 bg-zinc-900 border border-zinc-750 px-2.5 sm:px-3 py-1.5 rounded-md transition-colors duration-150 font-medium"
                     title="Reiniciar el cuadro de Playoffs al sorteo inicial"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reiniciar Playoffs</span>
+                    <span>Reiniciar<span className="hidden sm:inline"> Playoffs</span></span>
                   </button>
                 </>
               )}
