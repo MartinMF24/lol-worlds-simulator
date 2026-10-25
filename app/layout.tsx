@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://simulador-world-2026.vercel.app'),
   title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
   description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
+  verification: {
+    google: 'google48e4afc597f1adf5',
+  },
   icons: {
     icon: '/assets/icon-48.png',
     shortcut: '/assets/icon-48.png',
