@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://simulador-world-2026.vercel.app'),
+  metadataBase: new URL('https://lol-worlds-2026-simulator.vercel.app'),
   title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
   description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
   verification: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Simulador Worlds 2026 — Fase Suiza & Playoffs',
     description: 'Simulador analítico e interactivo del Campeonato Mundial de League of Legends 2026. Predice la Fase Suiza y el cuadro de eliminación directa.',
-    url: 'https://simulador-world-2026.vercel.app',
+    url: 'https://lol-worlds-2026-simulator.vercel.app',
     siteName: 'Simulador Worlds 2026',
     images: [
       {
