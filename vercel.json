@@ -1,4 +1,11 @@
 {
+  "cleanUrls": false,
+  "rewrites": [
+    {
+      "source": "/google48e4afc597f1adf5.html",
+      "destination": "/google48e4afc597f1adf5"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -32,4 +39,3 @@
     }
   ]
 }
-
