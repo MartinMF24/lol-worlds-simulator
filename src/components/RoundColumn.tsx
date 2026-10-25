@@ -3,7 +3,11 @@ import { Match, Round } from '../types/swiss';
 import { MatchProbability } from '../types/ratings';
 import { RecordPoolGroup } from './RecordPoolGroup';
 import { MatchCard } from './MatchCard';
-import { formatMatchDateHeader } from '../utils/timezone';
+import {
+  formatMatchDateHeader,
+  formatMatchDateRange,
+  getMatchDateKey,
+} from '../utils/timezone';
 import { Dices } from 'lucide-react';
 
 interface RoundColumnProps {
@@ -62,17 +66,12 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
     return { poolsMap: map, sortedPoolKeys: keys };
   }, [matches]);
 
-  // Check if all scheduled matches share the same date
+  // Calculate round date or date range (e.g. "23 de Octubre" or "25-26 de Octubre")
   const roundDateHeader = useMemo(() => {
-    const scheduledMatches = matches.filter((m) => !!m.scheduledTime);
-    if (scheduledMatches.length === 0) return null;
-
-    const firstDateHeader = formatMatchDateHeader(scheduledMatches[0].scheduledTime, timeZone);
-    const allSameDate = scheduledMatches.every(
-      (m) => formatMatchDateHeader(m.scheduledTime, timeZone) === firstDateHeader
+    return formatMatchDateRange(
+      matches.map((m) => m.scheduledTime),
+      timeZone
     );
-
-    return allSameDate ? firstDateHeader : null;
   }, [matches, timeZone]);
 
   // Calculate nextScheduledTimeMap for LIVE indicator calculation and sort matches chronologically
@@ -174,18 +173,41 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
           </div>
         ) : roundNumber === 1 ? (
           <div className="space-y-1.5 w-full">
-            {sortedMatches.map((match) => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                selectedWinnerId={selectedWinners[match.id]}
-                isReadOnly={isPast}
-                onSelectWinner={onSelectWinner}
-                timeZone={timeZone}
-                nextScheduledTime={nextScheduledTimeMap[match.id]}
-                probability={probabilitiesMap?.[match.id]}
-              />
-            ))}
+            {sortedMatches.map((match, idx) => {
+              const currentDateKey = getMatchDateKey(match.scheduledTime, timeZone);
+              const prevDateKey =
+                idx > 0 ? getMatchDateKey(sortedMatches[idx - 1].scheduledTime, timeZone) : null;
+              const showDayDivider =
+                !!prevDateKey && !!currentDateKey && currentDateKey !== prevDateKey;
+              const dayLabel = showDayDivider
+                ? formatMatchDateHeader(match.scheduledTime, timeZone)
+                : null;
+
+              return (
+                <React.Fragment key={match.id}>
+                  {showDayDivider && (
+                    <div className="flex items-center gap-2 py-1 px-0.5 select-none">
+                      <div className="flex-1 border-t border-zinc-800" />
+                      <span
+                        suppressHydrationWarning
+                        className="text-[9px] font-mono text-zinc-400 font-medium px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 flex-shrink-0"
+                      >
+                        {dayLabel}
+                      </span>
+                    </div>
+                  )}
+                  <MatchCard
+                    match={match}
+                    selectedWinnerId={selectedWinners[match.id]}
+                    isReadOnly={isPast}
+                    onSelectWinner={onSelectWinner}
+                    timeZone={timeZone}
+                    nextScheduledTime={nextScheduledTimeMap[match.id]}
+                    probability={probabilitiesMap?.[match.id]}
+                  />
+                </React.Fragment>
+              );
+            })}
           </div>
         ) : (
           sortedPoolKeys.map((poolKey, index) => (
