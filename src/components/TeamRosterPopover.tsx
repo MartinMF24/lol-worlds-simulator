@@ -13,11 +13,11 @@ export interface TeamRosterPopoverProps {
 }
 
 const ROLES = [
-  { key: 'top', label: 'Top', icon: '/assets/role_top.png' },
-  { key: 'jungle', label: 'Jungla', icon: '/assets/role_jungle.png' },
-  { key: 'mid', label: 'Mid', icon: '/assets/role_mid.png' },
-  { key: 'bot', label: 'Bot / ADC', icon: '/assets/role_bot.png' },
-  { key: 'support', label: 'Soporte', icon: '/assets/role_support.png' },
+  { key: 'top', label: 'Top', icon: '/assets/role_top.webp' },
+  { key: 'jungle', label: 'Jungla', icon: '/assets/role_jungle.webp' },
+  { key: 'mid', label: 'Mid', icon: '/assets/role_mid.webp' },
+  { key: 'bot', label: 'Bot / ADC', icon: '/assets/role_bot.webp' },
+  { key: 'support', label: 'Soporte', icon: '/assets/role_support.webp' },
 ] as const;
 
 export const TeamRosterPopover: React.FC<TeamRosterPopoverProps> = ({ team, coords }) => {
