@@ -223,7 +223,7 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
           team1Id: 'los',
           team2Id: 'tsw',
           scheduledTime: '2026-10-26T16:00:00-03:00',
-          winnerId: null,
+          winnerId: 'los',
         },
       ],
     },
