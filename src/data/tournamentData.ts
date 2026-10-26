@@ -216,7 +216,7 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
           team1Id: 'tl',
           team2Id: 'al',
           scheduledTime: '2026-10-26T19:00:00-03:00',
-          winnerId: null,
+          winnerId: 'tl',
         },
         {
           id: 'r3-m8',
@@ -230,7 +230,50 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
     {
       roundNumber: 4,
       isRealDraw: false,
-      matches: [],
+      matches: [        
+        {
+          id: 'r4-m1',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-28T17:00:00-03:00',
+          winnerId: null,
+        },
+        {
+          id: 'r4-m2',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-28T20:00:00-03:00',
+          winnerId: null,
+        },
+        {
+          id: 'r4-m3',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-29T17:00:00-03:00',
+          winnerId: null,
+        },
+        {
+          id: 'r4-m4',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-29T20:00:00-03:00',
+          winnerId: null,
+        },
+        {
+          id: 'r4-m5',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-30T17:00:00-03:00',
+          winnerId: null,
+        },
+        {
+          id: 'r4-m6',
+          team1Id: '',
+          team2Id: '',
+          scheduledTime: '2026-10-30T20:00:00-03:00',
+          winnerId: null,
+        },
+      ],
     },
     {
       roundNumber: 5,
