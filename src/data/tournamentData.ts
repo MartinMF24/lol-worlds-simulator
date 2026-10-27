@@ -235,7 +235,7 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
           id: 'r4-m1',
           team1Id: 'tes',
           team2Id: 'blg',
-          scheduledTime: '2026-10-28T17:00:00-03:00',
+          scheduledTime: '2026-10-29T20:00:00-03:00',
           winnerId: null,
         },
         {
@@ -249,14 +249,14 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
           id: 'r4-m3',
           team1Id: 'mkoi',
           team2Id: 't1',
-          scheduledTime: '2026-10-29T17:00:00-03:00',
+          scheduledTime: '2026-10-28T17:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r4-m4',
           team1Id: 'kc',
           team2Id: 'cfo',
-          scheduledTime: '2026-10-29T20:00:00-03:00',
+          scheduledTime: '2026-10-29T17:00:00-03:00',
           winnerId: null,
         },
         {
