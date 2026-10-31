@@ -1,5 +1,7 @@
 import { Team } from '../types/swiss';
 import { PlayoffBracket, PlayoffMatch } from '../types/playoffs';
+import { RealPlayoffsData, RealPlayoffMatchData } from '../data/tournamentData';
+import { BASE_15_TEAMS, PLAY_IN_CANDIDATES } from '../data/teams';
 import { shuffle } from './swissDraw';
 
 /**
@@ -132,6 +134,124 @@ export function generatePlayoffsBracket(qualifiedTeams: Team[]): PlayoffBracket 
     semis,
     final,
     champion: null,
+    isRealDraw: false,
   };
 }
 
+/**
+ * Creates the Playoffs Bracket from the official real draw in tournamentData.ts.
+ * Respects official winners and scheduled match times, and propagates winners
+ * up through Semifinals and Final automatically.
+ */
+export function createRealPlayoffsBracket(
+  realPlayoffs: RealPlayoffsData,
+  qualifiedTeams?: Team[]
+): PlayoffBracket {
+  const allTeamsPool = [...BASE_15_TEAMS, ...PLAY_IN_CANDIDATES];
+
+  const findTeam = (id: string | null | undefined): Team | null => {
+    if (!id) return null;
+    const matchQualified = qualifiedTeams?.find((t) => t.id === id);
+    if (matchQualified) return { ...matchQualified };
+    const matchBase = allTeamsPool.find((t) => t.id === id);
+    if (matchBase) return { ...matchBase };
+    return null;
+  };
+
+  const matchMap = new Map<string, RealPlayoffMatchData>();
+  (realPlayoffs.matches || []).forEach((m) => matchMap.set(m.id, m));
+
+  // 1. Quarters (qf-1, qf-2, qf-3, qf-4)
+  const quarterIds = ['qf-1', 'qf-2', 'qf-3', 'qf-4'];
+  const quarters: PlayoffMatch[] = quarterIds.map((id, index) => {
+    const realMatch = matchMap.get(id);
+    const team1 = findTeam(realMatch?.team1Id);
+    const team2 = findTeam(realMatch?.team2Id);
+    const winnerId = realMatch?.winnerId || null;
+    const isOfficialWinner = !!realMatch?.winnerId;
+
+    return {
+      id,
+      round: 'quarter',
+      matchIndex: index,
+      team1,
+      team2,
+      winnerId,
+      nextMatchId: index < 2 ? 'sf-1' : 'sf-2',
+      nextSlot: (index % 2 === 0 ? 1 : 2) as (1 | 2),
+      scheduledTime: realMatch?.scheduledTime,
+      isOfficialWinner,
+    };
+  });
+
+  const getMatchWinnerTeam = (match: PlayoffMatch): Team | null => {
+    if (!match.winnerId) return null;
+    if (match.team1?.id === match.winnerId) return match.team1;
+    if (match.team2?.id === match.winnerId) return match.team2;
+    return null;
+  };
+
+  // 2. Semifinals (sf-1, sf-2)
+  const sf1Real = matchMap.get('sf-1');
+  const sf2Real = matchMap.get('sf-2');
+
+  const sf1Team1 = getMatchWinnerTeam(quarters[0]) || findTeam(sf1Real?.team1Id);
+  const sf1Team2 = getMatchWinnerTeam(quarters[1]) || findTeam(sf1Real?.team2Id);
+  const sf2Team1 = getMatchWinnerTeam(quarters[2]) || findTeam(sf2Real?.team1Id);
+  const sf2Team2 = getMatchWinnerTeam(quarters[3]) || findTeam(sf2Real?.team2Id);
+
+  const semis: PlayoffMatch[] = [
+    {
+      id: 'sf-1',
+      round: 'semi',
+      matchIndex: 0,
+      team1: sf1Team1,
+      team2: sf1Team2,
+      winnerId: sf1Real?.winnerId || null,
+      nextMatchId: 'f-1',
+      nextSlot: 1,
+      scheduledTime: sf1Real?.scheduledTime,
+      isOfficialWinner: !!sf1Real?.winnerId,
+    },
+    {
+      id: 'sf-2',
+      round: 'semi',
+      matchIndex: 1,
+      team1: sf2Team1,
+      team2: sf2Team2,
+      winnerId: sf2Real?.winnerId || null,
+      nextMatchId: 'f-1',
+      nextSlot: 2,
+      scheduledTime: sf2Real?.scheduledTime,
+      isOfficialWinner: !!sf2Real?.winnerId,
+    },
+  ];
+
+  // 3. Final (f-1)
+  const f1Real = matchMap.get('f-1');
+  const f1Team1 = getMatchWinnerTeam(semis[0]) || findTeam(f1Real?.team1Id);
+  const f1Team2 = getMatchWinnerTeam(semis[1]) || findTeam(f1Real?.team2Id);
+
+  const final: PlayoffMatch = {
+    id: 'f-1',
+    round: 'final',
+    matchIndex: 0,
+    team1: f1Team1,
+    team2: f1Team2,
+    winnerId: f1Real?.winnerId || null,
+    nextMatchId: null,
+    nextSlot: 1,
+    scheduledTime: f1Real?.scheduledTime,
+    isOfficialWinner: !!f1Real?.winnerId,
+  };
+
+  const champion = getMatchWinnerTeam(final);
+
+  return {
+    quarters,
+    semis,
+    final,
+    champion,
+    isRealDraw: true,
+  };
+}

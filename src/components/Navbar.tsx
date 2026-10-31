@@ -20,6 +20,7 @@ interface NavbarProps {
   onResetSwiss: () => void;
   onResetPlayoffs: () => void;
   onAutoPickByProbability?: () => void;
+  isPlayoffsRealDraw?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -39,6 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onResetSwiss,
   onResetPlayoffs,
   onAutoPickByProbability,
+  isPlayoffsRealDraw = false,
 }) => {
   const [isAutoPickMenuOpen, setIsAutoPickMenuOpen] = useState(false);
   const autoPickRef = useRef<HTMLDivElement>(null);
@@ -86,10 +88,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               type="button"
-              disabled={!isPlayInSelected}
+              disabled={!isPlayInSelected && !isPlayoffsRealDraw}
               onClick={() => onTabChange('playoffs')}
               className={`px-2.5 sm:px-3 py-1 rounded-md text-xs transition-colors duration-150 flex items-center gap-1.5 ${
-                !isPlayInSelected
+                !isPlayInSelected && !isPlayoffsRealDraw
                   ? 'text-zinc-600 cursor-not-allowed opacity-50'
                   : activeTab === 'playoffs'
                   ? 'bg-zinc-800 text-white font-medium shadow-sm'
@@ -97,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <span>Playoffs</span>
-              {isFinished && (
+              {(isFinished || isPlayoffsRealDraw) && (
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               )}
             </button>
@@ -106,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Center: Stage Context Info (Hidden on screens < lg to preserve mobile space) */}
         <div className="hidden lg:flex items-center gap-2.5 text-xs font-medium">
-          {!isPlayInSelected ? (
+          {!isPlayInSelected && !isPlayoffsRealDraw ? (
             <div className="flex items-center gap-2 text-zinc-300">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               <span>Fase de Selección • Play-in</span>
@@ -129,6 +131,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-2 text-zinc-300">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
               <span>Cuadro de Eliminación Directa</span>
+              {isPlayoffsRealDraw && (
+                <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700">
+                  Sorteo Oficial
+                </span>
+              )}
               {hasChampion && (
                 <>
                   <span className="text-zinc-650">•</span>
@@ -163,8 +170,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Action buttons (only when Play-in is defined) */}
-          {isPlayInSelected && (
+          {/* Action buttons (when Play-in is defined or Playoffs is in real draw) */}
+          {(isPlayInSelected || isPlayoffsRealDraw) && (
             <>
               {activeTab === 'swiss' ? (
                 <>
@@ -286,7 +293,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     type="button"
                     onClick={onResetPlayoffs}
                     className="flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 bg-zinc-900 border border-zinc-750 px-2.5 sm:px-3 py-1.5 rounded-md transition-colors duration-150 font-medium"
-                    title="Reiniciar el cuadro de Playoffs al sorteo inicial"
+                    title="Reiniciar el cuadro de Playoffs"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reiniciar<span className="hidden sm:inline"> Playoffs</span></span>

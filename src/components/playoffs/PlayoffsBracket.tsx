@@ -10,6 +10,7 @@ interface PlayoffsBracketProps {
   onReroll: () => void;
   onSelectWinner: (matchId: string, winnerId: string) => void;
   onBackToSwiss?: () => void;
+  timeZone?: string;
 }
 
 export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
@@ -18,6 +19,7 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
   onReroll,
   onSelectWinner,
   onBackToSwiss,
+  timeZone,
 }) => {
   if (!bracket) {
     return (
@@ -61,10 +63,15 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
           <span className="text-xs font-semibold text-zinc-300">
             Cuadro de Eliminación Directa
           </span>
+          {bracket.isRealDraw && (
+            <span className="text-[9px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700">
+              Sorteo Oficial
+            </span>
+          )}
         </div>
 
-        {/* Reroll Button: Visible ONLY in Quarters before ANY winner is picked */}
-        {canReroll && (
+        {/* Reroll Button: Visible ONLY in Quarters before ANY winner is picked AND if NOT official draw */}
+        {canReroll && !bracket.isRealDraw && (
           <button
             type="button"
             onClick={onReroll}
@@ -98,13 +105,15 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
               </span>
               <PlayoffMatchCard
                 match={bracket.quarters[0]}
-                matchTitle="Partido 1 (3-0 vs 3-2)"
+                matchTitle={bracket.isRealDraw ? "Cuartos 1" : "Partido 1 (3-0 vs 3-2)"}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
               <PlayoffMatchCard
                 match={bracket.quarters[1]}
-                matchTitle="Partido 2"
+                matchTitle={bracket.isRealDraw ? "Cuartos 2" : "Partido 2"}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
             </div>
 
@@ -118,13 +127,15 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
               </span>
               <PlayoffMatchCard
                 match={bracket.quarters[2]}
-                matchTitle="Partido 3"
+                matchTitle={bracket.isRealDraw ? "Cuartos 3" : "Partido 3"}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
               <PlayoffMatchCard
                 match={bracket.quarters[3]}
-                matchTitle="Partido 4 (3-0 vs 3-2)"
+                matchTitle={bracket.isRealDraw ? "Cuartos 4" : "Partido 4 (3-0 vs 3-2)"}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
             </div>
           </div>
@@ -150,6 +161,7 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
               <PlayoffMatchCard
                 match={bracket.semis[0]}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
             </div>
 
@@ -161,6 +173,7 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
               <PlayoffMatchCard
                 match={bracket.semis[1]}
                 onSelectWinner={onSelectWinner}
+                timeZone={timeZone}
               />
             </div>
           </div>
@@ -184,6 +197,7 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
             <PlayoffMatchCard
               match={bracket.final}
               onSelectWinner={onSelectWinner}
+              timeZone={timeZone}
             />
           </div>
         </div>
@@ -205,4 +219,3 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
     </div>
   );
 };
-

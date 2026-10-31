@@ -11,6 +11,7 @@ export interface PlayoffsViewProps {
   onBackToSwiss: () => void;
   onChampionChange?: (hasChampion: boolean) => void;
   onResetRegister?: (resetFn: () => void) => void;
+  timeZone?: string;
 }
 
 export const PlayoffsView: React.FC<PlayoffsViewProps> = ({
@@ -19,6 +20,7 @@ export const PlayoffsView: React.FC<PlayoffsViewProps> = ({
   onBackToSwiss,
   onChampionChange,
   onResetRegister,
+  timeZone,
 }) => {
   const {
     bracket,
@@ -29,12 +31,12 @@ export const PlayoffsView: React.FC<PlayoffsViewProps> = ({
     initializeBracket,
   } = usePlayoffsSimulation(qualifiedTeams);
 
-  // Sync playoffs bracket whenever the 8 qualified teams are ready
+  // Sync playoffs bracket whenever the 8 qualified teams are ready and bracket is not yet initialized
   useEffect(() => {
-    if (isSwissFinished && qualifiedTeams.length === 8) {
+    if (!bracket && isSwissFinished && qualifiedTeams.length === 8) {
       initializeBracket(qualifiedTeams);
     }
-  }, [isSwissFinished, qualifiedTeams, initializeBracket]);
+  }, [bracket, isSwissFinished, qualifiedTeams, initializeBracket]);
 
   // Notify parent of champion status for Navbar badge
   useEffect(() => {
@@ -54,8 +56,8 @@ export const PlayoffsView: React.FC<PlayoffsViewProps> = ({
         onReroll={reroll}
         onSelectWinner={selectWinner}
         onBackToSwiss={onBackToSwiss}
+        timeZone={timeZone}
       />
     </div>
   );
 };
-

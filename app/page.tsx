@@ -12,6 +12,7 @@ import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { Team } from '../src/types/swiss';
 import { TimezoneSelector } from '../src/components/TimezoneSelector';
 import { TIMEZONE_OPTIONS, TimezoneOption } from '../src/types/timezone';
+import { REAL_TOURNAMENT_DATA } from '../src/data/tournamentData';
 
 // Lazy-load Playoffs completely so its code, draw algorithm and components
 // are NOT downloaded in the initial bundle until the user accesses Playoffs.
@@ -29,7 +30,11 @@ const PlayoffsView = dynamic(
 );
 
 export default function WorldsSimulatorPage() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('swiss');
+  const isPlayoffsRealDraw = !!REAL_TOURNAMENT_DATA.playoffs?.isRealDraw;
+
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    return isPlayoffsRealDraw ? 'playoffs' : 'swiss';
+  });
   const [hasChampion, setHasChampion] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
   const [selectedTimezone, setSelectedTimezone] = useState<TimezoneOption>('ART');
@@ -75,7 +80,7 @@ export default function WorldsSimulatorPage() {
     setIsPreparing(false);
     setHasChampion(false);
     playoffsResetRef.current = null;
-    setActiveTab('swiss');
+    setActiveTab(isPlayoffsRealDraw ? 'playoffs' : 'swiss');
     resetSwissSimulation();
   };
 
@@ -104,7 +109,7 @@ export default function WorldsSimulatorPage() {
         <Navbar
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          isPlayInSelected={false}
+          isPlayInSelected={isPlayoffsRealDraw || false}
           currentRound={1}
           totalMatchesInRound={0}
           selectedCount={0}
@@ -117,9 +122,10 @@ export default function WorldsSimulatorPage() {
           onAutoPick={() => {}}
           onResetSwiss={() => {}}
           onResetPlayoffs={() => {}}
+          isPlayoffsRealDraw={isPlayoffsRealDraw}
         />
         <main className="flex-1 w-full max-w-[1920px] mx-auto p-2.5 sm:p-4 lg:p-5 flex items-center justify-center">
-          <SplashScreen message="Iniciando simulador..." />
+          <SplashScreen message={isPlayoffsRealDraw ? 'Iniciando Playoffs...' : 'Iniciando simulador...'} />
         </main>
       </div>
     );
@@ -145,6 +151,7 @@ export default function WorldsSimulatorPage() {
         onResetSwiss={handleResetTournament}
         onResetPlayoffs={() => playoffsResetRef.current?.()}
         onAutoPickByProbability={autoPickWinnersByProbability}
+        isPlayoffsRealDraw={isPlayoffsRealDraw}
       />
 
       {/* Main View Area */}
@@ -153,10 +160,22 @@ export default function WorldsSimulatorPage() {
           {isPreparing ? (
             /* Splash screen while preparing Round 1 draw */
             <SplashScreen message="Preparando sorteo de Ronda 1..." />
+          ) : activeTab === 'playoffs' ? (
+            /* Step 3: Playoffs Stage Dynamically Loaded */
+            <PlayoffsView
+              qualifiedTeams={qualifiedTeams}
+              isSwissFinished={isSwissFinished}
+              onBackToSwiss={() => setActiveTab('swiss')}
+              onChampionChange={setHasChampion}
+              onResetRegister={(resetFn) => {
+                playoffsResetRef.current = resetFn;
+              }}
+              timeZone={TIMEZONE_OPTIONS[selectedTimezone].timeZone}
+            />
           ) : !selectedPlayInTeam ? (
             /* Step 1: Initial Play-in Selection View */
             <PlayInSelection onSelectTeam={handleSelectPlayIn} />
-          ) : activeTab === 'swiss' ? (
+          ) : (
             /* Step 2: Swiss Stage 6 Adaptable Columns */
             <div className="flex flex-col w-full">
               {/* Mobile Quick-Jump Round Navigation */}
@@ -229,17 +248,6 @@ export default function WorldsSimulatorPage() {
                 />
               </div>
             </div>
-          ) : (
-            /* Step 3: Playoffs Stage Dynamically Loaded */
-            <PlayoffsView
-              qualifiedTeams={qualifiedTeams}
-              isSwissFinished={isSwissFinished}
-              onBackToSwiss={() => setActiveTab('swiss')}
-              onChampionChange={setHasChampion}
-              onResetRegister={(resetFn) => {
-                playoffsResetRef.current = resetFn;
-              }}
-            />
           )}
         </ErrorBoundary>
       </main>

@@ -30,6 +30,40 @@ export function formatMatchTime(
 }
 
 /**
+ * Formats match date and time as "DD/MM HH:mm" for the given timezone.
+ * Example: "05/11 14:00"
+ */
+export function formatMatchDateTime(
+  isoString: string | undefined,
+  timeZoneOption: TimezoneOption | string = 'ART'
+): string {
+  if (!isoString) return '';
+  try {
+    const timeZone =
+      typeof timeZoneOption === 'string' && timeZoneOption in TIMEZONE_OPTIONS
+        ? TIMEZONE_OPTIONS[timeZoneOption as TimezoneOption].timeZone
+        : timeZoneOption;
+
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
+
+    const day = new Intl.DateTimeFormat('es-ES', { day: '2-digit', timeZone }).format(date);
+    const month = new Intl.DateTimeFormat('es-ES', { month: '2-digit', timeZone }).format(date);
+    const time = new Intl.DateTimeFormat('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone,
+    }).format(date);
+
+    return `${day}/${month} ${time}`;
+  } catch (err) {
+    console.error('[formatMatchDateTime] Error formatting match date and time:', err);
+    return '';
+  }
+}
+
+/**
  * Formats match date header as "20 de Octubre" for the given timezone.
  */
 export function formatMatchDateHeader(

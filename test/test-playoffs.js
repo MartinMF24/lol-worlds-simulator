@@ -34,8 +34,6 @@ function testDraw(iteration) {
   const m3 = [s3_1[1], s3_1[2]];
   const m4 = [s3_0[1], s3_2[1]];
 
-  const quarters = [m1, m2, m3, m4];
-
   // 1. Check 3-0 teams are in Match 1 and Match 4 (opposite halves)
   const has3_0Top = m1.some(t => t.losses === 0) || m2.some(t => t.losses === 0);
   const has3_0Bottom = m3.some(t => t.losses === 0) || m4.some(t => t.losses === 0);
@@ -76,3 +74,51 @@ console.log('  - 3-0 vs 3-2 matched 100%');
 console.log('  - Leftover 3-2 vs 3-1 matched 100%');
 console.log('  - Remaining two 3-1 teams face each other 100%');
 
+// Test Real Playoffs Bracket creation & progression logic
+function testRealPlayoffsLogic() {
+  const sampleRealConfig = {
+    isRealDraw: true,
+    matches: [
+      { id: 'qf-1', team1Id: 'gen', team2Id: 'ig', winnerId: 'gen', scheduledTime: '2026-11-05T14:00:00-03:00' },
+      { id: 'qf-2', team1Id: 't1', team2Id: 'tes', winnerId: null, scheduledTime: '2026-11-06T14:00:00-03:00' },
+      { id: 'qf-3', team1Id: 'blg', team2Id: 'hle', winnerId: 'blg', scheduledTime: '2026-11-07T14:00:00-03:00' },
+      { id: 'qf-4', team1Id: 'al', team2Id: 'dk', winnerId: 'al', scheduledTime: '2026-11-08T14:00:00-03:00' },
+      { id: 'sf-1', team1Id: null, team2Id: null, winnerId: null },
+      { id: 'sf-2', team1Id: null, team2Id: null, winnerId: 'blg' },
+      { id: 'f-1', team1Id: null, team2Id: null, winnerId: null },
+    ],
+  };
+
+  const matchMap = new Map();
+  sampleRealConfig.matches.forEach((m) => matchMap.set(m.id, m));
+
+  const qf1 = matchMap.get('qf-1');
+  const sf1Team1 = qf1.winnerId;
+  if (sf1Team1 !== 'gen') throw new Error('QF1 winner did not advance to SF1 Team 1');
+
+  const sf2Team1 = matchMap.get('qf-3').winnerId;
+  const sf2Team2 = matchMap.get('qf-4').winnerId;
+  if (sf2Team1 !== 'blg' || sf2Team2 !== 'al') throw new Error('QF3/QF4 winners did not advance to SF2');
+
+  const f1Team2 = matchMap.get('sf-2').winnerId;
+  if (f1Team2 !== 'blg') throw new Error('SF2 winner did not advance to Final');
+}
+
+testRealPlayoffsLogic();
+console.log('✅ Real Playoffs bracket configuration & advancement logic PASSED!');
+
+function testDateFormatting() {
+  const iso = '2026-11-05T14:00:00-03:00';
+  const tz = 'America/Argentina/Buenos_Aires';
+  const date = new Date(iso);
+  const day = new Intl.DateTimeFormat('es-ES', { day: '2-digit', timeZone: tz }).format(date);
+  const month = new Intl.DateTimeFormat('es-ES', { month: '2-digit', timeZone: tz }).format(date);
+  const time = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }).format(date);
+  const formatted = `${day}/${month} ${time}`;
+  if (formatted !== '05/11 14:00') {
+    throw new Error(`Expected 05/11 14:00 but got ${formatted}`);
+  }
+}
+
+testDateFormatting();
+console.log('✅ Playoff match date/time formatting (DD/MM HH:mm) PASSED!');

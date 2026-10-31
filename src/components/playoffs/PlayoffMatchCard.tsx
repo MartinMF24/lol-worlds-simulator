@@ -1,23 +1,30 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import Image from 'next/image';
 import { PlayoffMatch } from '../../types/playoffs';
 import { Team } from '../../types/swiss';
 import { getTeamImage } from '../../data/teamImages';
 import { TeamRosterTooltip } from '../TeamRosterTooltip';
 import { sanitizeString } from '../../utils/security';
-import { Check } from 'lucide-react';
+import { formatMatchDateTime } from '../../utils/timezone';
+import { Check, Clock } from 'lucide-react';
 
 interface PlayoffMatchCardProps {
   match: PlayoffMatch;
   matchTitle?: string;
   onSelectWinner: (matchId: string, winnerId: string) => void;
+  timeZone?: string;
 }
 
 export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = memo(({
   match,
   matchTitle,
   onSelectWinner,
+  timeZone = 'America/Argentina/Buenos_Aires',
 }) => {
+  const formattedDateTime = useMemo(() => {
+    return match.scheduledTime ? formatMatchDateTime(match.scheduledTime, timeZone) : '';
+  }, [match.scheduledTime, timeZone]);
+
   const renderTeamRow = (team: Team | null, isTop: boolean) => {
     if (!team) {
       return (
@@ -29,17 +36,25 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = memo(({
 
     const isWinner = match.winnerId === team.id;
     const isLoser = match.winnerId !== null && !isWinner;
+    const isOfficial = !!match.isOfficialWinner;
 
     return (
       <TeamRosterTooltip team={team}>
         <button
           type="button"
-          onClick={() => onSelectWinner(match.id, team.id)}
+          disabled={isOfficial}
+          onClick={() => !isOfficial && onSelectWinner(match.id, team.id)}
           className={`w-full h-8 flex items-center justify-between px-2.5 rounded text-left transition-colors duration-150 border ${
             isWinner
-              ? 'bg-zinc-800 text-white font-medium border-amber-400/60 shadow-sm'
+              ? isOfficial
+                ? 'bg-emerald-500/10 text-white font-medium border-emerald-500/30 cursor-default'
+                : 'bg-zinc-800 text-white font-medium border-amber-400/60 shadow-sm'
               : isLoser
-              ? 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              ? isOfficial
+                ? 'opacity-40 text-zinc-400 border-transparent cursor-default'
+                : 'opacity-40 text-zinc-400 hover:opacity-80 hover:bg-zinc-800/40 border-transparent'
+              : isOfficial
+              ? 'text-zinc-200 border-transparent cursor-default'
               : 'text-zinc-200 hover:bg-zinc-800/70 border-transparent'
           }`}
         >
@@ -67,17 +82,28 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = memo(({
 
           {/* Right: Swiss Record & Checkmark */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-[10px] font-mono text-zinc-400">
-              {team.wins}-{team.losses}
-            </span>
+            {team.wins !== undefined && team.losses !== undefined && (
+              <span className="text-[10px] font-mono text-zinc-400">
+                {team.wins}-{team.losses}
+              </span>
+            )}
 
             {/* Fixed-width checkmark container so row dimensions never shift */}
             <span
               className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 transition-opacity duration-150 ${
                 isWinner
-                  ? 'text-amber-400 bg-amber-400/20 opacity-100'
+                  ? isOfficial
+                    ? 'text-emerald-400 bg-emerald-500/20 opacity-100 ring-1 ring-emerald-500/40'
+                    : 'text-amber-400 bg-amber-400/20 opacity-100'
                   : 'opacity-0 pointer-events-none'
               }`}
+              title={
+                isWinner
+                  ? isOfficial
+                    ? 'Ganador oficial definido en el torneo real'
+                    : 'Ganador seleccionado por simulación'
+                  : undefined
+              }
             >
               <Check className="w-2.5 h-2.5 stroke-[3]" />
             </span>
@@ -91,18 +117,33 @@ export const PlayoffMatchCard: React.FC<PlayoffMatchCardProps> = memo(({
 
   return (
     <div className="w-full bg-zinc-900 rounded-lg border border-zinc-750 p-1.5 hover:border-zinc-650 transition-colors duration-150 shadow-sm">
-      {matchTitle && (
-        <div className="px-1.5 pt-0.5 pb-1 flex items-center justify-between border-b border-zinc-800 mb-1">
-          <span className="text-[10px] uppercase font-mono font-medium text-zinc-400">
-            {matchTitle}
-          </span>
-          {isPlayable && !match.winnerId && (
-            <span className="text-[9px] text-amber-400/80 font-normal">
-              Elige ganador
+      <div className="px-1.5 pt-0.5 pb-1 flex items-center justify-between border-b border-zinc-800 mb-1 min-h-[22px]">
+        <div className="flex items-center gap-1.5 min-w-0">
+          {matchTitle && (
+            <span className="text-[10px] uppercase font-mono font-medium text-zinc-400">
+              {matchTitle}
+            </span>
+          )}
+          {match.isOfficialWinner && (
+            <span className="text-[9px] font-mono font-semibold text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/25 leading-none">
+              Oficial
             </span>
           )}
         </div>
-      )}
+
+        {match.scheduledTime ? (
+          <div className="flex items-center gap-1 text-[9px] font-mono text-zinc-400">
+            <Clock className="w-2.5 h-2.5 text-zinc-500" />
+            <span suppressHydrationWarning>
+              {formattedDateTime}
+            </span>
+          </div>
+        ) : isPlayable && !match.winnerId ? (
+          <span className="text-[9px] text-amber-400/80 font-normal">
+            Elige ganador
+          </span>
+        ) : null}
+      </div>
 
       <div className="space-y-0.5">
         {renderTeamRow(match.team1, true)}

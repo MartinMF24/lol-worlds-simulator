@@ -11,6 +11,8 @@ export interface PlayoffMatch {
   winnerId: string | null;
   nextMatchId: string | null;
   nextSlot: 1 | 2; // Slot 1 (top) or 2 (bottom) in the next match
+  scheduledTime?: string;
+  isOfficialWinner?: boolean;
 }
 
 export interface PlayoffBracket {
@@ -18,5 +20,5 @@ export interface PlayoffBracket {
   semis: PlayoffMatch[];
   final: PlayoffMatch;
   champion: Team | null;
+  isRealDraw?: boolean;
 }
-

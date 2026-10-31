@@ -15,6 +15,16 @@
  *    - winnerId: Si se especifica el ID del equipo ganador en todos los partidos de una ronda,
  *      el simulador considerará esa ronda como YA JUGADA y avanzará automáticamente
  *      a la siguiente ronda.
+ *
+ * 3. playoffs (Cuadro de Eliminación Directa):
+ *    - isRealDraw: true -> El sorteo oficial de Playoffs ya se realizó. La aplicación
+ *      arranca DIRECTAMENTE en el cuadro de Playoffs y carga los cruces oficiales.
+ *      No se permite re-sortear los emparejamientos con el botón de dados.
+ *    - isRealDraw: false -> El sorteo oficial aún no se realizó; el simulador
+ *      generará los cruces dinámicamente cuando concluya la Fase Suiza y permitirá re-sortearlos.
+ *    - winnerId: Si se especifica el ID del equipo ganador en un partido de Playoffs,
+ *      ese resultado se considera OFICIAL (check verde), queda bloqueado y avanza
+ *      automáticamente a la siguiente fase (o corona al campeón).
  */
 
 export interface RealMatchData {
@@ -31,9 +41,23 @@ export interface RealRoundData {
   matches: RealMatchData[];
 }
 
+export interface RealPlayoffMatchData {
+  id: string; // 'qf-1' | 'qf-2' | 'qf-3' | 'qf-4' | 'sf-1' | 'sf-2' | 'f-1'
+  team1Id?: string | null;
+  team2Id?: string | null;
+  scheduledTime?: string; // Formato ISO 8601 (ej. '2026-11-05T14:00:00-03:00')
+  winnerId?: string | null; // ID del equipo ganador o null si aún no se jugó
+}
+
+export interface RealPlayoffsData {
+  isRealDraw: boolean;
+  matches: RealPlayoffMatchData[];
+}
+
 export interface RealTournamentConfig {
   playInWinnerId: string | null;
   rounds: RealRoundData[];
+  playoffs?: RealPlayoffsData;
 }
 
 export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
@@ -303,5 +327,61 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
       ],
     },
   ],
+
+  playoffs: {
+    // Cambiar a true cuando se realice el sorteo oficial de cuartos de final
+    isRealDraw: false,
+    matches: [
+      {
+        id: 'qf-1',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-03T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'qf-2',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-04T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'qf-3',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-05T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'qf-4',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-06T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'sf-1',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-07T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'sf-2',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-08T19:00:00-03:00',
+        winnerId: null,
+      },
+      {
+        id: 'f-1',
+        team1Id: '',
+        team2Id: '',
+        scheduledTime: '2026-11-14T16:00:00-03:00',
+        winnerId: null,
+      },
+    ],
+  },
 };
 
