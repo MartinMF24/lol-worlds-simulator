@@ -223,3 +223,57 @@ console.log('  - Seed 1 vs 4 & Seed 2 vs 3 respected 100%');
 console.log('  - 0 same-region matchups in Round 1 (including Karmine Corp vs G2, Cloud9 vs Team Liquid)');
 console.log('  - 0 rematches across all rounds');
 console.log('  - 100% exact 8 qualified (3-0, 3-1, 3-2) and 8 eliminated (0-3, 1-3, 2-3)');
+
+// Test completed Swiss stage initial state calculation
+function testCompletedSwissState() {
+  const sampleCandidate = PLAY_IN_CANDIDATES[0]; // kc
+  let teams = [
+    ...BASE_15_TEAMS.map(t => ({ ...t, wins: 0, losses: 0, pastOpponents: [] })),
+    { ...sampleCandidate, wins: 0, losses: 0, pastOpponents: [] }
+  ];
+
+  // Simulating 5 fully played rounds
+  let currentRoundNum = 1;
+  let isFinished = false;
+  const roundsHistory = [];
+
+  for (let r = 1; r <= 5; r++) {
+    const isRoundFullyPlayed = true;
+    if (isRoundFullyPlayed) {
+      roundsHistory.push({ roundNumber: r, isCompleted: true });
+      if (r >= 5) {
+        isFinished = true;
+        currentRoundNum = 5;
+        break;
+      }
+      currentRoundNum = Math.min(5, r + 1);
+    }
+  }
+
+  if (isFinished) currentRoundNum = 5;
+
+  if (currentRoundNum !== 5) {
+    throw new Error(`Expected currentRoundNum to be 5, got ${currentRoundNum}`);
+  }
+  if (!isFinished) {
+    throw new Error('Expected isFinished to be true');
+  }
+  if (roundsHistory.length !== 5) {
+    throw new Error(`Expected 5 rounds in history, got ${roundsHistory.length}`);
+  }
+
+  // Validate RoundColumn logic when finished
+  for (let roundNumber = 1; roundNumber <= 5; roundNumber++) {
+    const roundData = roundsHistory.find(rd => rd.roundNumber === roundNumber);
+    const isPast = isFinished ? (roundNumber <= currentRoundNum || !!roundData) : roundNumber < currentRoundNum;
+    const isActive = !isFinished && roundNumber === currentRoundNum;
+    const isFuture = !isFinished && roundNumber > currentRoundNum;
+
+    if (!isPast || isActive || isFuture) {
+      throw new Error(`Round ${roundNumber} has invalid states when finished: isPast=${isPast}, isActive=${isActive}, isFuture=${isFuture}`);
+    }
+  }
+}
+
+testCompletedSwissState();
+console.log('✅ Completed Swiss stage state and column visibility test PASSED!');

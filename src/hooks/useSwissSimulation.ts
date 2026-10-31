@@ -164,11 +164,13 @@ export function computeInitialTournamentState(
 
         const qualified = currentTeams.filter((t) => t.wins >= 3);
         const eliminated = currentTeams.filter((t) => t.losses >= 3);
-        if (qualified.length === 8 && eliminated.length === 8) {
+        if ((qualified.length === 8 && eliminated.length === 8) || r >= 5) {
           isFinished = true;
+          currentRoundNum = 5;
           break;
         }
 
+        currentRoundNum = Math.min(5, r + 1);
         continue;
       } else {
         // This is the active real round
@@ -191,6 +193,10 @@ export function computeInitialTournamentState(
       activeMatches = drawSwissRound(currentTeams, r);
       break;
     }
+  }
+
+  if (isFinished) {
+    currentRoundNum = 5;
   }
 
   return {

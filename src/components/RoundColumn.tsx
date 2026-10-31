@@ -37,9 +37,9 @@ export const RoundColumn: React.FC<RoundColumnProps> = memo(({
   isRealDraw = false,
   probabilitiesMap,
 }) => {
-  const isPast = roundNumber < currentRound || (isFinished && roundNumber <= currentRound);
-  const isActive = roundNumber === currentRound && !isFinished;
-  const isFuture = roundNumber > currentRound;
+  const isPast = isFinished ? (roundNumber <= currentRound || !!roundData) : roundNumber < currentRound;
+  const isActive = !isFinished && roundNumber === currentRound;
+  const isFuture = !isFinished && roundNumber > currentRound;
 
   const matches: Match[] = isPast
     ? roundData?.matches || []
