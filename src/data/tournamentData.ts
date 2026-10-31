@@ -277,26 +277,26 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
     },
     {
       roundNumber: 5,
-      isRealDraw: false,
+      isRealDraw: true,
       matches: [
         {
           id: 'r5-m1',
-          team1Id: '',
-          team2Id: '',
+          team1Id: 'los',
+          team2Id: 'lyon',
           scheduledTime: '2026-10-31T14:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r5-m4',
-          team1Id: '',
-          team2Id: '',
+          team1Id: 'kc',
+          team2Id: 'mkoi',
           scheduledTime: '2026-10-31T17:00:00-03:00',
           winnerId: null,
         },
         {
           id: 'r5-m3',
-          team1Id: '',
-          team2Id: '',
+          team1Id: 'blg',
+          team2Id: 'hle',
           scheduledTime: '2026-10-31T20:00:00-03:00',
           winnerId: null,
         },
