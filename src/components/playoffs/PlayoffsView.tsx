@@ -49,7 +49,7 @@ export const PlayoffsView: React.FC<PlayoffsViewProps> = ({
   }, [resetPlayoffs, onResetRegister]);
 
   return (
-    <div className="w-full min-w-[950px] p-2">
+    <div className="w-full flex flex-col p-1 sm:p-2">
       <PlayoffsBracket
         bracket={bracket}
         canReroll={canReroll}

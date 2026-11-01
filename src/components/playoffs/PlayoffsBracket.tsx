@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { PlayoffBracket } from '../../types/playoffs';
 import { PlayoffMatchCard } from './PlayoffMatchCard';
 import { ChampionCard } from './ChampionCard';
 import { Dices, Trophy, ArrowLeft } from 'lucide-react';
+
+const PLAYOFF_STAGES = [
+  { id: 'quarters', label: 'Cuartos' },
+  { id: 'semis', label: 'Semifinales' },
+  { id: 'final', label: 'Gran Final' },
+  { id: 'champion', label: 'Campeón' },
+] as const;
 
 interface PlayoffsBracketProps {
   bracket: PlayoffBracket | null;
@@ -21,6 +28,29 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
   onBackToSwiss,
   timeZone,
 }) => {
+  const currentStage = useMemo(() => {
+    if (!bracket) return 'quarters';
+    if (bracket.champion) return 'champion';
+    if (bracket.final?.winnerId) return 'champion';
+    if (bracket.final?.team1 && bracket.final?.team2) return 'final';
+    if (bracket.semis?.some((m) => m.team1 && m.team2)) return 'semis';
+    return 'quarters';
+  }, [bracket]);
+
+  const scrollToColumn = useCallback((elementId: string) => {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, []);
+
+  // Auto-scroll mobile view to current active stage when bracket advances
+  useEffect(() => {
+    if (bracket && typeof window !== 'undefined' && window.innerWidth < 768) {
+      scrollToColumn(`playoff-${currentStage}`);
+    }
+  }, [currentStage, bracket, scrollToColumn]);
+
   if (!bracket) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[500px]">
@@ -46,25 +76,25 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
   }
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-3 sm:gap-4">
       {/* Top action row */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 px-1">
+        <div className="flex items-center gap-2 min-w-0">
           {onBackToSwiss && (
             <button
               type="button"
               onClick={onBackToSwiss}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 border border-zinc-800 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs text-zinc-400 hover:text-white hover:bg-zinc-900 border border-zinc-800 transition-colors flex-shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Ver Fase Suiza</span>
             </button>
           )}
-          <span className="text-xs font-semibold text-zinc-300">
+          <span className="text-xs font-semibold text-zinc-300 hidden sm:inline truncate">
             Cuadro de Eliminación Directa
           </span>
           {bracket.isRealDraw && (
-            <span className="text-[9px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700">
+            <span className="text-[9px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700 flex-shrink-0">
               Sorteo Oficial
             </span>
           )}
@@ -75,7 +105,7 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
           <button
             type="button"
             onClick={onReroll}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-xs font-medium transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-xs font-medium transition-all shadow-sm flex-shrink-0"
             title="Re-sortear los emparejamientos de Cuartos de Final"
           >
             <Dices className="w-3.5 h-3.5" />
@@ -84,10 +114,34 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
         )}
       </div>
 
-      {/* Bracket Canvas: 4 Columns */}
-      <div className="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full items-stretch min-h-[580px]">
+      {/* Mobile Quick-Jump Stage Navigation */}
+      <div className="flex md:hidden items-center gap-1.5 overflow-x-auto pb-2 mb-1 select-none">
+        {PLAYOFF_STAGES.map((stage) => {
+          const isCurrent = stage.id === currentStage;
+          return (
+            <button
+              key={stage.id}
+              type="button"
+              onClick={() => scrollToColumn(`playoff-${stage.id}`)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                isCurrent
+                  ? 'bg-amber-400 text-zinc-950 shadow-sm'
+                  : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-750'
+              }`}
+            >
+              {stage.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Bracket Canvas: 4 Columns (Snap-scrollable on mobile, 4-col grid on desktop) */}
+      <div className="flex md:grid md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full md:min-w-[950px] overflow-x-auto snap-x snap-mandatory pb-2 md:pb-0 items-stretch min-h-[500px] md:min-h-[580px]">
         {/* Column 1: Cuartos de Final (4 matches) */}
-        <div className="flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5">
+        <div
+          id="playoff-quarters"
+          className="w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5"
+        >
           <div className="px-2 py-1.5 border-b border-zinc-800 flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-white">
               Cuartos de Final
@@ -142,7 +196,10 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
         </div>
 
         {/* Column 2: Semifinales (2 matches) */}
-        <div className="flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5">
+        <div
+          id="playoff-semis"
+          className="w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5"
+        >
           <div className="px-2 py-1.5 border-b border-zinc-800 flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-white">
               Semifinales
@@ -180,7 +237,10 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
         </div>
 
         {/* Column 3: Gran Final (1 match) */}
-        <div className="flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5">
+        <div
+          id="playoff-final"
+          className="w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5"
+        >
           <div className="px-2 py-1.5 border-b border-zinc-800 flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-white">
               Gran Final
@@ -203,7 +263,10 @@ export const PlayoffsBracket: React.FC<PlayoffsBracketProps> = ({
         </div>
 
         {/* Column 4: Campeón del Mundo */}
-        <div className="flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5">
+        <div
+          id="playoff-champion"
+          className="w-[84vw] max-w-[320px] flex-shrink-0 snap-center md:w-full md:max-w-none md:flex-shrink md:snap-align-none min-w-0 flex flex-col rounded-xl border border-zinc-750 bg-zinc-900/40 p-2.5"
+        >
           <div className="px-2 py-1.5 border-b border-zinc-800 flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-amber-300">
               Campeón
