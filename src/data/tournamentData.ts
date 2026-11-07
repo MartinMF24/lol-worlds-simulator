@@ -344,7 +344,7 @@ export const REAL_TOURNAMENT_DATA: RealTournamentConfig = {
         team1Id: 'kc',
         team2Id: 't1',
         scheduledTime: '2026-11-06T19:00:00-03:00',
-        winnerId: null,
+        winnerId: 't1',
       },
       {
         id: 'qf-3',
